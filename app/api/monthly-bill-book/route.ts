@@ -441,7 +441,7 @@ export async function POST(request: NextRequest) {
     await page.setContent(fullHTML, { waitUntil: 'networkidle0' })
 
     const pdf = await page.pdf({
-      format: 'A4',
+      format: 'a4',
       printBackground: true,
       preferCSSPageSize: true,
       displayHeaderFooter: false,

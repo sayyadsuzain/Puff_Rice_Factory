@@ -387,7 +387,7 @@ export async function GET(request: NextRequest) {
     console.log('✅ BILL-PDF: HTML content set, generating PDF...')
 
     const pdf = await page.pdf({
-      format: 'A4',
+      format: 'a4',
       printBackground: true,
       preferCSSPageSize: true,
       displayHeaderFooter: false,
