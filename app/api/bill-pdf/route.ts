@@ -102,6 +102,7 @@ export async function GET(request: NextRequest) {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
         <style>
           @page {
             size: A4;
@@ -140,11 +141,11 @@ export async function GET(request: NextRequest) {
             font-size: 250px;
             font-weight: 400;
             letter-spacing: 12px;
-            color: rgba(128, 128, 128, 0.12);
+            color: rgba(128, 128, 128, 0.14);
             pointer-events: none;
             user-select: none;
             z-index: 0;
-            font-family: "Times New Roman", "Georgia", serif;
+            font-family: "Libre Baskerville", "Times New Roman", Georgia, serif;
           }
 
           .header-section {
