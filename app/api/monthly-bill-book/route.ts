@@ -159,7 +159,7 @@ export async function POST(request: NextRequest) {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
         <script src="https://cdn.tailwindcss.com"></script>
         <style>
           @page {
@@ -196,14 +196,14 @@ export async function POST(request: NextRequest) {
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 180px;
+            font-size: 200px;
             font-weight: 700;
-            letter-spacing: 8px;
-            color: rgba(140, 140, 140, 0.18);
+            letter-spacing: 14px;
+            color: rgba(140, 140, 140, 0.2);
             pointer-events: none;
             user-select: none;
             z-index: 0;
-            font-family: "Oswald", "Arial Black", sans-serif;
+            font-family: "Playfair Display", "Times New Roman", Georgia, serif;
           }
 
           .header-section {
