@@ -379,11 +379,12 @@ export async function GET(request: NextRequest) {
 
     console.log('🎨 BILL-PDF: Starting Puppeteer...')
 
-    const browser = await puppeteer.connect({
-      browserWSEndpoint: `wss://chrome.browserless.io?token=${process.env.BROWSERLESS_TOKEN}`,
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
     })
 
-    console.log('✅ BILL-PDF: Connected to Browserless successfully')
+    console.log('✅ BILL-PDF: Puppeteer launched successfully')
 
     const page = await browser.newPage()
     await page.setContent(fullHTML, { waitUntil: 'networkidle0' })
