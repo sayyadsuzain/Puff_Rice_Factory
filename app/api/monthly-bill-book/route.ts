@@ -437,41 +437,45 @@ export async function POST(request: NextRequest) {
       </html>
     `
 
-    const browser = await puppeteer.launch({
-      args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
-    })
+    let browser
+    try {
+      browser = await puppeteer.launch({
+        args: chromium.args,
+        defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath(),
+        headless: chromium.headless,
+        ignoreHTTPSErrors: true,
+      })
 
-    const page = await browser.newPage()
-    await page.setContent(fullHTML, { waitUntil: 'networkidle0' })
+      const page = await browser.newPage()
+      await page.setContent(fullHTML, { waitUntil: 'networkidle0' })
 
-    const pdf = await page.pdf({
-      format: 'a4',
-      printBackground: true,
-      preferCSSPageSize: true,
-      displayHeaderFooter: false,
-      margin: {
-        top: '0mm',
-        bottom: '0mm',
-        left: '0mm',
-        right: '0mm'
-      }
-    })
+      const pdf = await page.pdf({
+        format: 'a4',
+        printBackground: true,
+        preferCSSPageSize: true,
+        displayHeaderFooter: false,
+        margin: {
+          top: '0mm',
+          bottom: '0mm',
+          left: '0mm',
+          right: '0mm'
+        }
+      })
 
-    await browser.close()
+      const filename = mode === 'monthly'
+        ? `${billType && billType !== 'both' ? billType.charAt(0).toUpperCase() + billType.slice(1) + '_' : ''}BillBook_${getMonthName(month)}_${financialYear}.pdf`
+        : `${billType && billType !== 'both' ? billType.charAt(0).toUpperCase() + billType.slice(1) + '_' : ''}YearlyBillBook_${financialYear}.pdf`
 
-    const filename = mode === 'monthly'
-      ? `${billType && billType !== 'both' ? billType.charAt(0).toUpperCase() + billType.slice(1) + '_' : ''}BillBook_${getMonthName(month)}_${financialYear}.pdf`
-      : `${billType && billType !== 'both' ? billType.charAt(0).toUpperCase() + billType.slice(1) + '_' : ''}YearlyBillBook_${financialYear}.pdf`
-
-    return new NextResponse(pdf, {
-      headers: {
-        'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename=${filename}`
-      }
-    })
+      return new NextResponse(pdf, {
+        headers: {
+          'Content-Type': 'application/pdf',
+          'Content-Disposition': `attachment; filename=${filename}`
+        }
+      })
+    } finally {
+      if (browser) await browser.close()
+    }
 
   } catch (err) {
     console.error('PDF generation error:', err)

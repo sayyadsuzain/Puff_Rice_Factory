@@ -380,44 +380,48 @@ export async function GET(request: NextRequest) {
 
     console.log('🎨 BILL-PDF: Starting Puppeteer...')
 
-    const browser = await puppeteer.launch({
-      args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
-    })
+    let browser
+    try {
+      browser = await puppeteer.launch({
+        args: chromium.args,
+        defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath(),
+        headless: chromium.headless,
+        ignoreHTTPSErrors: true,
+      })
 
-    console.log('✅ BILL-PDF: Puppeteer launched successfully')
+      console.log('✅ BILL-PDF: Puppeteer launched successfully')
 
-    const page = await browser.newPage()
-    await page.setContent(fullHTML, { waitUntil: 'networkidle0' })
+      const page = await browser.newPage()
+      await page.setContent(fullHTML, { waitUntil: 'networkidle0' })
 
-    console.log('✅ BILL-PDF: HTML content set, generating PDF...')
+      console.log('✅ BILL-PDF: HTML content set, generating PDF...')
 
-    const pdf = await page.pdf({
-      format: 'a4',
-      printBackground: true,
-      preferCSSPageSize: true,
-      displayHeaderFooter: false,
-      margin: {
-        top: '0mm',
-        bottom: '0mm',
-        left: '0mm',
-        right: '0mm'
-      }
-    })
+      const pdf = await page.pdf({
+        format: 'a4',
+        printBackground: true,
+        preferCSSPageSize: true,
+        displayHeaderFooter: false,
+        margin: {
+          top: '0mm',
+          bottom: '0mm',
+          left: '0mm',
+          right: '0mm'
+        }
+      })
 
-    await browser.close()
+      const filename = `Bill_${bill.bill_number}.pdf`
+      console.log('✅ BILL-PDF: PDF generated successfully, filename:', filename)
 
-    const filename = `Bill_${bill.bill_number}.pdf`
-    console.log('✅ BILL-PDF: PDF generated successfully, filename:', filename)
-
-    return new NextResponse(pdf, {
-      headers: {
-        'Content-Type': 'application/pdf',
-        'Content-Disposition': `inline; filename=${filename}`
-      }
-    })
+      return new NextResponse(pdf, {
+        headers: {
+          'Content-Type': 'application/pdf',
+          'Content-Disposition': `inline; filename=${filename}`
+        }
+      })
+    } finally {
+      if (browser) await browser.close()
+    }
 
   } catch (error) {
     console.error('❌ BILL-PDF: PDF generation error:', error)

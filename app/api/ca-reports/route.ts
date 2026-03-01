@@ -51,49 +51,53 @@ export async function POST(request: NextRequest) {
     })
 
     // Generate PDF
-    const browser = await puppeteer.launch({
-      args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
-    })
+    let browser
+    try {
+      browser = await puppeteer.launch({
+        args: chromium.args,
+        defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath(),
+        headless: chromium.headless,
+        ignoreHTTPSErrors: true,
+      })
 
-    const page = await browser.newPage()
-    await page.setContent(reportHTML, { waitUntil: 'networkidle0' })
+      const page = await browser.newPage()
+      await page.setContent(reportHTML, { waitUntil: 'networkidle0' })
 
-    const pdf = await page.pdf({
-      format: 'a4',
-      printBackground: true,
-      displayHeaderFooter: true,
-      headerTemplate: `
+      const pdf = await page.pdf({
+        format: 'a4',
+        printBackground: true,
+        displayHeaderFooter: true,
+        headerTemplate: `
         <div style="font-size:10px; width:100%; text-align:center; color:#666;">
           CA Report - ${billType.toUpperCase()} Bills - ${financialYear}
         </div>
       `,
-      footerTemplate: `
+        footerTemplate: `
         <div style="font-size:9px; width:100%; text-align:center; color:#666;">
           Page <span class="pageNumber"></span> of <span class="totalPages"></span>
         </div>
       `,
-      margin: {
-        top: '15mm',
-        bottom: '15mm',
-        left: '10mm',
-        right: '10mm'
-      },
-      preferCSSPageSize: true
-    })
+        margin: {
+          top: '15mm',
+          bottom: '15mm',
+          left: '10mm',
+          right: '10mm'
+        },
+        preferCSSPageSize: true
+      })
 
-    await browser.close()
+      const filename = `CA_Report_${billType.toUpperCase()}_${financialYear}${month && month !== 'all' ? `_${month}` : ''}.pdf`
 
-    const filename = `CA_Report_${billType.toUpperCase()}_${financialYear}${month && month !== 'all' ? `_${month}` : ''}.pdf`
-
-    return new NextResponse(pdf, {
-      headers: {
-        'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename=${filename}`
-      }
-    })
+      return new NextResponse(pdf, {
+        headers: {
+          'Content-Type': 'application/pdf',
+          'Content-Disposition': `attachment; filename=${filename}`
+        }
+      })
+    } finally {
+      if (browser) await browser.close()
+    }
 
   } catch (error) {
     console.error('CA Report generation error:', error)
