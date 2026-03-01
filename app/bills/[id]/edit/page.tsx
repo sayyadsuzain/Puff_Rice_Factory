@@ -461,7 +461,7 @@ export default function EditBillPage() {
 
   return (
     <ProtectedRoute>
-      <div className="container mx-auto px-4 py-6 md:py-8">
+      <div className="container py-6 md:py-8">
         {/* Responsive Back Button */}
         <div className="mb-4 md:mb-6">
           <Link href={`/bills/${billId}`}>

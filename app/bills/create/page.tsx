@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -19,6 +20,7 @@ import { GSTToggle } from '@/components/gst-toggle'
 export const dynamic = 'force-dynamic'
 
 export default function CreateBillPage() {
+  const router = useRouter()
   // Bill Type & Header
   const [billType, setBillType] = useState<'kacchi' | 'pakki'>('kacchi')
   const [billDate, setBillDate] = useState(new Date().toISOString().split('T')[0])
@@ -387,9 +389,21 @@ export default function CreateBillPage() {
 
       toast.success(`Bill created successfully! (${billType})`)
 
+      console.log('🎉 BILL CREATED - About to redirect...')
+      console.log('Bill ID:', billId)
+      console.log('Redirect URL:', `/bills/${billId}`)
+
+      // Safety check - ensure billId exists
+      if (!billId) {
+        console.error('❌ ERROR: billId is undefined/null!')
+        toast.error('Bill created but redirect failed. Please navigate manually.')
+        return
+      }
+
       // Add a small delay to show the success message before redirect
       setTimeout(() => {
-        window.location.href = `/bills/${billId}`
+        console.log('🔄 REDIRECTING NOW to:', `/bills/${billId}`)
+        router.push(`/bills/${billId}`)
       }, 1500)
     } catch (error) {
       console.error('Error creating bill:', error)
@@ -409,7 +423,7 @@ export default function CreateBillPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-6 md:py-8">
+    <div className="container py-6 md:py-8">
       {/* Responsive Back Button */}
       <div className="mb-4 md:mb-6">
         <Link href="/bills">

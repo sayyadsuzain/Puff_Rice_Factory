@@ -136,6 +136,7 @@ export async function POST(request: NextRequest) {
     })
 
     const summary = calculateSummary(bills)
+    const totalPages = 1 + bills.length // 1 for cover page, rest for bills
 
     // Generate cover page HTML
     const coverHTML = generateCoverHTML(summary, financialYear, month, mode, billType)
@@ -143,7 +144,7 @@ export async function POST(request: NextRequest) {
     // Generate bill pages HTML
     const billsHTML = bills.map((bill, index) => {
       // Generate HTML that matches the professional A4 layout
-      const billHTML = generateBillHTML(bill, itemsMap[bill.id] || [])
+      const billHTML = generateBillHTML(bill, itemsMap[bill.id] || [], index + 2, totalPages) // index + 2 because page 1 is cover
 
       return billHTML
     }).join('')
@@ -413,6 +414,16 @@ export async function POST(request: NextRequest) {
             font-size: 20px;
             margin-top: 50px;
           }
+
+          .page-number {
+            position: absolute;
+            bottom: 10mm;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 10px;
+            color: #666;
+          }
         </style>
       </head>
       <body>
@@ -433,19 +444,14 @@ export async function POST(request: NextRequest) {
     const pdf = await page.pdf({
       format: 'A4',
       printBackground: true,
-      displayHeaderFooter: true,
-      footerTemplate: `
-        <div style="font-size:9px; width:100%; text-align:center; color:#666; letter-spacing:0.5px;">
-          Page <span class="pageNumber"></span> of <span class="totalPages"></span>
-        </div>
-      `,
+      preferCSSPageSize: true,
+      displayHeaderFooter: false,
       margin: {
-        top: '10mm',
-        bottom: '15mm',
-        left: '10mm',
-        right: '10mm'
-      },
-      preferCSSPageSize: true
+        top: '0mm',
+        bottom: '0mm',
+        left: '0mm',
+        right: '0mm'
+      }
     })
 
     await browser.close()
@@ -508,7 +514,7 @@ function generateCoverHTML(summary: any, financialYear: string, month: number, m
   `
 }
 
-function generateBillHTML(bill: any, items: any[]): string {
+function generateBillHTML(bill: any, items: any[], pageNumber: number, totalPages: number): string {
   const isKacchi = bill.bill_type === 'kacchi'
   const partyName = bill.parties?.name || 'Party Not Found'
   const partyGst = bill.parties?.gst_number || ''
@@ -737,6 +743,11 @@ function generateBillHTML(bill: any, items: any[]): string {
               </div>
             </div>
           ` : ''}
+      </div>
+
+      <!-- Page Number -->
+      <div class="page-number">
+        Page ${pageNumber} of ${totalPages}
       </div>
     </div>
   `

@@ -33,11 +33,11 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
       {/* Header */}
       <header className="bg-white shadow-sm border-b sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex justify-between items-center h-14 sm:h-16">
             {/* Logo */}
             <div className="flex items-center">
-              <h1 className="text-xl font-bold text-red-600">MS TRADING</h1>
-              <span className="ml-2 text-sm text-gray-500 hidden sm:inline">Bill Management</span>
+              <h1 className="text-lg sm:text-xl font-bold text-red-600">MS TRADING COMPANY</h1>
+              <span className="ml-2 text-xs sm:text-sm text-gray-500 hidden sm:inline">Bill Management</span>
             </div>
 
             {/* Desktop Menu */}

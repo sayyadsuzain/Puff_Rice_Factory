@@ -19,150 +19,123 @@ export default function BillDisplay({ bill, items, partyName, partyGst }: BillDi
   // Calculate total in words for the grand total
   const totalInWords = numberToWords(grandTotal)
 
-  const handlePrint = () => {
-    window.open(`/api/bill-pdf?id=${bill.id}`, '_blank')
+  const handlePrint = async () => {
+    try {
+      console.log('🎨 BILL-PDF: Generating PDF for bill ID:', bill.id)
+      // Open the Puppeteer-generated PDF inline in browser
+      const pdfUrl = `/api/bill-pdf?id=${bill.id}`
+      window.open(pdfUrl, '_blank')
+    } catch (error) {
+      console.error('❌ BILL-PDF: Error generating PDF:', error)
+      alert('Failed to generate PDF. Please try again.')
+    }
   }
 
   return (
     <div
-      className="bill-display"
+      className="a4-container bill-display"
       style={{
         maxWidth: '896px',
         margin: '0 auto',
         backgroundColor: 'white',
         boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
-        padding: '16px'
+        padding: '12px',
+        width: '100%',
+        overflowX: 'auto'
       }}
     >
       {/* Print Button */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }} className="no-print">
         <Button onClick={handlePrint} variant="outline" size="sm">
           <Printer className="h-4 w-4 mr-2" />
           Print PDF
         </Button>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        {/* Header */}
-        <div style={{ borderBottom: '2px solid #dc2626', paddingBottom: '16px' }}>
-          {isKacchi ? (
-            <div style={{ textAlign: 'center' }}>
-              <div style={{
-                display: 'inline-block',
-                backgroundColor: '#dc2626',
-                color: 'white',
-                padding: '4px 16px',
-                borderRadius: '4px',
-                fontSize: '14px',
-                fontWeight: 'bold',
-                marginBottom: '8px'
-              }}>
-                CASH / CREDIT MEMO
-              </div>
-            </div>
-          ) : (
-            <div>
-              <div style={{ textAlign: 'center', marginBottom: '8px' }}>
-                <div style={{ fontSize: '12px', color: '#6b7280' }}>Subject to Sangli Jurisdiction</div>
-              </div>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{
-                  display: 'inline-block',
-                  backgroundColor: '#dc2626',
-                  color: 'white',
-                  padding: '4px 16px',
-                  borderRadius: '4px',
-                  fontSize: '14px',
-                  fontWeight: 'bold',
-                  marginBottom: '8px'
-                }}>
-                  CREDIT MEMO
-                </div>
-              </div>
-            </div>
-          )}
 
-          <h1 style={{
-            textAlign: 'center',
-            fontSize: '30px',
-            fontWeight: 'bold',
-            color: '#dc2626',
-            marginBottom: '4px'
-          }}>
-            {COMPANY_INFO.name}
+      {/* Header Section */}
+      <div className="w-full border-b pb-4 mb-6 relative">
+        {/* Top Row */}
+        <div className="flex justify-between items-start text-xs">
+          <div className="text-gray-600">
+            {bill.bill_type !== "kacchi" && (
+              <div>Subject to Sangli Jurisdiction</div>
+            )}
+          </div>
+
+          <div className="text-right text-xs leading-tight">
+            <div className="font-semibold">BILL NO.</div>
+            <div className="text-red-600 font-bold text-sm">
+              {(() => {
+                const billNum = String(bill.bill_number)
+                if (billNum.startsWith('P') || billNum.startsWith('K')) {
+                  const numPart = billNum.substring(1)
+                  return billNum.charAt(0) + numPart.padStart(3, '0')
+                } else {
+                  const prefix = bill.bill_type === 'kacchi' ? 'K' : 'P'
+                  return `${prefix}${billNum.padStart(3, '0')}`
+                }
+              })()}
+            </div>
+            <div className="mt-2 font-semibold">DATE</div>
+            <div>{formatDate(bill.bill_date)}</div>
+          </div>
+        </div>
+
+        {/* Company Center */}
+        <div className="text-center mt-2">
+          <h1 className="text-2xl font-extrabold tracking-widest text-red-600">
+            M S TRADING COMPANY
           </h1>
-          <p style={{ textAlign: 'center', fontSize: '12px' }}>
-            {COMPANY_INFO.address}
-          </p>
-          {!isKacchi && (
-            <p style={{ textAlign: 'center', fontSize: '12px', marginTop: '4px' }}>
-              GST IN : {COMPANY_INFO.gst}
-            </p>
-          )}
-        </div>
+          <div className="text-xs tracking-wide text-gray-700 mt-1">
+            KUPWAD MIDC NEAR NAV KRISHNA VALLEY, PLOT NO L-52
+          </div>
 
-        {/* Bill Info */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', fontSize: '14px', marginTop: '16px' }}>
-          <div>
-            <div style={{ fontWeight: 'bold' }}>From :</div>
-            <div style={{ color: '#6b7280' }}>{COMPANY_INFO.name}</div>
+          {/* Contact */}
+          <div className="text-xs mt-1">
+            Contact: 9860022450 / 9561420666
           </div>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontWeight: 'bold' }}>No.</div>
-            <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#dc2626' }}>{(() => {
-              const billNum = String(bill.bill_number)
-              if (billNum.startsWith('P') || billNum.startsWith('K')) {
-                const numPart = billNum.substring(1)
-                return billNum.charAt(0) + numPart.padStart(3, '0')
-              } else {
-                const prefix = bill.bill_type === 'kacchi' ? 'K' : 'P'
-                return `${prefix}${billNum.padStart(3, '0')}`
-              }
-            })()}</div>
-          </div>
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ fontWeight: 'bold' }}>Date :</div>
-            <div style={{ fontWeight: 'bold' }}>{formatDate(bill.bill_date)}</div>
+
+          {/* Memo Badge */}
+          <div className="mt-3">
+            <span className="bg-red-600 text-white text-xs px-4 py-1 rounded">
+              {bill.bill_type === "kacchi"
+                ? "CASH / CREDIT MEMO"
+                : "CREDIT MEMO"}
+            </span>
           </div>
         </div>
+      </div>
 
-        {/* Party Details */}
-        <div style={{
-          borderTop: '1px solid #d1d5db',
-          borderBottom: '1px solid #d1d5db',
-          padding: '8px 0',
-          marginTop: '16px'
-        }}>
-          <div style={{ fontSize: '14px' }}>
-            <span style={{ fontWeight: 'bold' }}>M/s. </span>
-            <span>{partyName || '_'.repeat(40)}</span>
-          </div>
-          {(bill.vehicle_number || (!isKacchi && partyGst)) && (
-            <div style={{ fontSize: '14px', marginTop: '4px', display: 'flex', justifyContent: 'space-between' }}>
-              {bill.vehicle_number && (
-                <div>
-                  <span style={{ fontWeight: 'bold' }}>Vehicle No.: </span>
-                  <span>{bill.vehicle_number}</span>
-                </div>
-              )}
-              {!isKacchi && partyGst && (
-                <div style={bill.vehicle_number ? { textAlign: 'right' } : {}}>
-                  <span style={{ fontWeight: 'bold' }}>GST No.: </span>
-                  <span>{partyGst}</span>
-                </div>
-              )}
-            </div>
-          )}
+      {/* Party Details - CA Compliant */}
+      <div className="border rounded-md p-3 mb-6 text-sm">
+        <div className="font-semibold">TO:</div>
+        <div className="mt-1 font-medium">
+          M/s. {partyName || '_'.repeat(40)}
         </div>
 
-        {/* Items Table */}
-        <table style={{ width: '100%', fontSize: '12px', borderCollapse: 'collapse', marginTop: '16px' }}>
-          <thead>
-            <tr style={{ backgroundColor: '#e5e7eb' }}>
-              <th style={{ border: '1px solid #9ca3af', padding: '8px', textAlign: 'left', fontWeight: 'bold' }}>Particulars</th>
-              <th style={{ border: '1px solid #9ca3af', padding: '8px', textAlign: 'center', fontWeight: 'bold', width: '64px' }}>Qty. Bags</th>
-              <th style={{ border: '1px solid #9ca3af', padding: '8px', textAlign: 'center', fontWeight: 'bold', width: '80px' }}>Weight in Kg.</th>
-              <th style={{ border: '1px solid #9ca3af', padding: '8px', textAlign: 'center', fontWeight: 'bold', width: '64px' }}>Rate</th>
-              <th style={{ border: '1px solid #9ca3af', padding: '8px', textAlign: 'right', fontWeight: 'bold', width: '96px' }}>Amount ₹</th>
+        {bill.vehicle_number && (
+          <div className="text-xs mt-1">
+            Vehicle No.: {bill.vehicle_number}
+          </div>
+        )}
+
+        {!isKacchi && partyGst && (
+          <div className="text-xs mt-1">
+            GST No.: {partyGst}
+          </div>
+        )}
+      </div>
+
+      {/* Items Table */}
+      <div className="flex-1 flex flex-col border border-gray-300 mb-6 overflow-x-auto">
+        <table className="w-full text-xs sm:text-sm border-collapse min-w-[600px]">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="w-[40%] sm:w-[50%] border px-1 sm:px-2 py-2 text-left">Particulars</th>
+              <th className="w-[15%] sm:w-[10%] border px-1 sm:px-2 py-2 text-center">Qty.</th>
+              <th className="w-[15%] sm:w-[12%] border px-1 sm:px-2 py-2 text-center">Weight</th>
+              <th className="w-[15%] sm:w-[12%] border px-1 sm:px-2 py-2 text-center">Rate</th>
+              <th className="w-[15%] sm:w-[16%] border px-1 sm:px-2 py-2 text-right">Amount ₹</th>
             </tr>
           </thead>
           <tbody>
@@ -170,115 +143,154 @@ export default function BillDisplay({ bill, items, partyName, partyGst }: BillDi
               const isPaddyItem = item.particular?.toLowerCase().includes('paddy')
               return (
                 <tr key={idx}>
-                  <td style={{ border: '1px solid #d1d5db', padding: '8px' }}>
+                  <td className="border px-2 py-2">
                     <div>{item.particular}</div>
                     {isPaddyItem && item.weight_kg && (
-                      <div style={{ fontSize: '11px', color: '#2563eb' }}>
+                      <div className="text-xs text-blue-600">
                         ({item.weight_kg}kg total)
                       </div>
                     )}
                   </td>
-                  <td style={{ border: '1px solid #d1d5db', padding: '8px', textAlign: 'center' }}>{item.qty_bags || ''}</td>
-                  <td style={{ border: '1px solid #d1d5db', padding: '8px', textAlign: 'center' }}>
+                  <td className="border px-2 py-2 text-center">{item.qty_bags || ''}</td>
+                  <td className="border px-2 py-2 text-center">
                     {isPaddyItem ? `${item.weight_kg || ''}kg` : (item.weight_kg || '')}
                   </td>
-                  <td style={{ border: '1px solid #d1d5db', padding: '8px', textAlign: 'center' }}>
-                    {item.rate ? `${item.rate.toFixed(2)} ${isPaddyItem ? '₹/kg' : '₹'}` : ''}
+                  <td className="border px-2 py-2 text-center">
+                    {item.rate ? `${item.rate.toFixed(2)}${isPaddyItem ? ' ₹/kg' : ''}` : ''}
                   </td>
-                  <td style={{ border: '1px solid #d1d5db', padding: '8px', textAlign: 'right' }}>{item.amount?.toFixed(2) || ''}</td>
+                  <td className="border px-2 py-2 text-right">{item.amount?.toFixed(2) || ''}</td>
                 </tr>
               )
             })}
-            {items.length < 3 && Array.from({ length: 3 - items.length }).map((_, idx) => (
+            {items.length < 8 && Array.from({ length: 8 - items.length }).map((_, idx) => (
               <tr key={`empty-${idx}`}>
-                <td style={{ border: '1px solid #d1d5db', padding: '8px' }}>&nbsp;</td>
-                <td style={{ border: '1px solid #d1d5db', padding: '8px' }}>&nbsp;</td>
-                <td style={{ border: '1px solid #d1d5db', padding: '8px' }}>&nbsp;</td>
-                <td style={{ border: '1px solid #d1d5db', padding: '8px' }}>&nbsp;</td>
-                <td style={{ border: '1px solid #d1d5db', padding: '8px' }}>&nbsp;</td>
+                <td className="border px-2 py-2">&nbsp;</td>
+                <td className="border px-2 py-2">&nbsp;</td>
+                <td className="border px-2 py-2">&nbsp;</td>
+                <td className="border px-2 py-2">&nbsp;</td>
+                <td className="border px-2 py-2">&nbsp;</td>
               </tr>
             ))}
           </tbody>
         </table>
+      </div>
 
-        {/* Total Section */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', fontSize: '14px', marginTop: '16px' }}>
-          <div>
-            <div style={{ fontWeight: 'bold' }}>Rs. in Words:</div>
-            <div style={{ fontSize: '12px', marginTop: '4px' }}>{totalInWords}</div>
-          </div>
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>SUB TOTAL</div>
-            <div style={{ fontSize: '18px', fontWeight: 'bold', borderTop: '1px solid black', paddingTop: '4px' }}>₹ {(bill.total_amount || 0).toFixed(2)}</div>
+      {/* Footer Section - Always at Bottom */}
+      <div className="mt-auto">
+        {/* Rs. in Words */}
+        <div className="mb-4 text-sm">
+          <div className="font-semibold">Rs. in Words:</div>
+          <div className="text-xs">{totalInWords}</div>
+        </div>
+
+        {/* Totals */}
+        <div className="flex justify-end">
+          <div className="w-full sm:w-72 text-xs sm:text-sm space-y-2">
+            <div className="flex justify-between">
+              <span className="font-semibold">SUB TOTAL</span>
+              <span>₹ {bill.total_amount.toFixed(2)}</span>
+            </div>
 
             {!isKacchi && bill.is_gst_enabled && (bill.gst_total || 0) > 0 && (
-              <div style={{ marginTop: '12px', marginBottom: '8px' }}>
+              <>
                 {(bill.cgst_percent || 0) > 0 && (
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '2px 0' }}>
-                    <span style={{ fontSize: '13px' }}>CGST @ {(bill.cgst_percent || 0)}%</span>
-                    <span style={{ fontWeight: 'bold', fontSize: '13px' }}>₹ {(bill.cgst_amount || 0).toFixed(2)}</span>
+                  <div className="flex justify-between">
+                    <span>CGST @ {bill.cgst_percent}%</span>
+                    <span>₹ {bill.cgst_amount.toFixed(2)}</span>
                   </div>
                 )}
                 {(bill.igst_percent || 0) > 0 && (
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '2px 0' }}>
-                    <span style={{ fontSize: '13px' }}>IGST @ {(bill.igst_percent || 0)}%</span>
-                    <span style={{ fontWeight: 'bold', fontSize: '13px' }}>₹ {(bill.igst_amount || 0).toFixed(2)}</span>
+                  <div className="flex justify-between">
+                    <span>IGST @ {bill.igst_percent}%</span>
+                    <span>₹ {bill.igst_amount.toFixed(2)}</span>
                   </div>
                 )}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '2px 0', borderTop: '1px solid #d1d5db', paddingTop: '4px', marginTop: '4px' }}>
-                  <span style={{ fontSize: '13px', fontWeight: 600 }}>GST Total:</span>
-                  <span style={{ fontWeight: 'bold', fontSize: '13px' }}>₹ {(bill.gst_total || 0).toFixed(2)}</span>
+                <div className="flex justify-between border-t pt-1">
+                  <span className="font-semibold">GST Total:</span>
+                  <span>₹ {bill.gst_total.toFixed(2)}</span>
                 </div>
-              </div>
+              </>
             )}
 
             {bill.balance != null && bill.balance > 0 && (
-              <div style={{ marginTop: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ fontSize: '14px', fontWeight: 'bold' }}>BALANCE</div>
-                <div style={{ fontSize: '14px', fontWeight: 'bold' }}>₹ {bill.balance.toFixed(2)}</div>
+              <div className="flex justify-between">
+                <span className="font-semibold">BALANCE</span>
+                <span>₹ {bill.balance.toFixed(2)}</span>
               </div>
             )}
 
-            <div style={{ borderTop: '2px solid black', paddingTop: '8px', marginTop: '12px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '18px', fontWeight: 'bold' }}>TOTAL</span>
-                <span style={{ fontSize: '20px', fontWeight: 'bold' }}>₹ {((bill.total_amount || 0) + (bill.gst_total || 0) + (bill.balance || 0)).toFixed(2)}</span>
-              </div>
+            <div className="border-t pt-2 flex justify-between text-lg font-bold">
+              <span>TOTAL</span>
+              <span>₹ {grandTotal.toFixed(2)}</span>
             </div>
-
-            {!isKacchi && (
-              <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#dc2626', marginTop: '16px', marginBottom: '16px' }}>
-                For M S TRADING COMPANY
-              </div>
-            )}
           </div>
         </div>
 
-        {/* Footer */}
-        <div style={{ borderTop: '1px solid black', paddingTop: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '12px' }}>
-          <div style={{ display: 'flex', gap: '16px' }}>
-            <span style={{ fontWeight: 'bold', color: '#dc2626' }}>Thank you</span>
-          </div>
-        </div>
-
-        {/* Bank Details for Pakki */}
+        {/* Bank Details & Signature */}
         {!isKacchi && bill.bank_name && bill.bank_ifsc && bill.bank_account && (
-          <div style={{ borderTop: '1px solid black', paddingTop: '12px', fontSize: '12px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }}>
-              <div>
-                <div style={{ fontWeight: 'bold', color: '#dc2626' }}>BANK : {bill.bank_name}</div>
-                <div>IFSC CODE NO. : {bill.bank_ifsc}</div>
-                <div>S. B. No. : {bill.bank_account}</div>
+          <div className="mt-6 pt-4 border-t text-xs">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end">
+              <div className="flex-1 mb-4 sm:mb-0">
+                <div className="font-semibold text-red-600 mb-1">BANK DETAILS:</div>
+                <div className="space-y-1">
+                  <div><strong>Bank:</strong> {bill.bank_name}</div>
+                  <div><strong>IFSC:</strong> {bill.bank_ifsc}</div>
+                  <div><strong>A/C No:</strong> {bill.bank_account}</div>
+                </div>
               </div>
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontWeight: 'bold', color: '#dc2626' }}>Contact:</div>
-                <div>9860022450</div>
-                <div>9561420666</div>
+              <div className="text-left sm:text-right">
+                <div className="font-semibold text-red-600 mb-4">For M S TRADING COMPANY</div>
+                <div className="border-t border-gray-400 w-32 pt-1 text-center text-xs">
+                  Authorised Signatory
+                </div>
               </div>
             </div>
           </div>
         )}
+
+        {/* Kacchi Signature */}
+        {isKacchi && (
+          <div className="mt-6 text-center sm:text-right">
+            <div className="font-semibold text-red-600 mb-4">For M S TRADING COMPANY</div>
+            <div className="border-t border-gray-400 w-32 pt-1 text-center text-xs ml-auto sm:ml-0">
+              Authorised Signatory
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Print Styles */}
+      <style jsx>{`
+        @media print {
+          body {
+            margin: 0;
+            padding: 0;
+            background: white;
+          }
+
+          .a4-container {
+            width: 210mm;
+            height: 297mm;
+            padding: 18mm;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+          }
+
+          .no-print {
+            display: none !important;
+          }
+
+          table {
+            page-break-inside: avoid;
+          }
+
+          .border {
+            border-width: 1px !important;
+          }
+        }
+      `}</style>
     </div>
   )
 }

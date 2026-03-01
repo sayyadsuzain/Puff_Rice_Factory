@@ -124,7 +124,7 @@ export function PartySearch({ value, onChange, placeholder = "Party Name (M/s.)"
       </Label>
 
       <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
+        <PopoverTrigger asChild suppressHydrationWarning>
           <Button
             variant="outline"
             role="combobox"
@@ -206,7 +206,7 @@ export function PartySearch({ value, onChange, placeholder = "Party Name (M/s.)"
 
       {/* Create Party Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
+        <DialogContent suppressHydrationWarning>
           <DialogHeader>
             <DialogTitle>Create New Party</DialogTitle>
           </DialogHeader>

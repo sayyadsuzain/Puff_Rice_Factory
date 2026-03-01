@@ -36,7 +36,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setLoading(false)
 
         if (event === 'SIGNED_IN') {
-          router.push('/bills')
+          // Only redirect to /bills if we're currently on the login page
+          // Don't redirect if we're already on protected routes during tab switching
+          if (typeof window !== 'undefined' && window.location.pathname === '/login') {
+            router.push('/bills')
+          }
         } else if (event === 'SIGNED_OUT') {
           router.push('/login')
         }

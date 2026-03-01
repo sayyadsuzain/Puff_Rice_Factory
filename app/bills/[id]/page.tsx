@@ -84,206 +84,52 @@ export default function BillDetailPage() {
     )
   }
 
-  const handlePrint = () => {
+  const handlePrint = async () => {
     // Check if party data is loaded
     if (!partyName || partyName.trim() === '') {
       toast.error('Please wait for party data to load before printing')
       return
     }
 
-    // Create a new window with the exact bill content and styling
-    const printWindow = window.open('', '_blank', 'width=900,height=700')
+    try {
+      toast.loading('Generating PDF...', { id: 'print' })
 
-    if (printWindow) {
-      // Get the bill HTML content
-      const billElement = document.querySelector('.bill-display') as HTMLElement
-      if (billElement) {
-        const billHTML = billElement.outerHTML
+      // Call the individual bill PDF API endpoint
+      const response = await fetch(`/api/bill-pdf?id=${billId}`)
 
-        // Get all the CSS styles that affect the bill (filtered for compatibility)
-        const styles = Array.from(document.styleSheets)
-          .map(sheet => {
-            try {
-              return Array.from(sheet.cssRules)
-                .map(rule => {
-                  const cssText = rule.cssText
-                  // Filter out rules with problematic color functions
-                  if (cssText.includes('lab(') ||
-                      cssText.includes('lch(') ||
-                      cssText.includes('oklab(') ||
-                      cssText.includes('oklch(') ||
-                      cssText.includes('color(') ||
-                      cssText.includes('hwb(')) {
-                    return '' // Skip problematic rules
-                  }
-                  return cssText
-                })
-                .filter(rule => rule.trim() !== '') // Remove empty rules
-                .join('\n')
-            } catch (e) {
-              return ''
-            }
-          })
-          .join('\n')
+      if (response.ok) {
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
 
-        // Create the print page with exact styling
-        printWindow.document.write(`
-          <!DOCTYPE html>
-          <html>
-            <head>
-              <title>Bill ${bill?.bill_type === 'kacchi' ? 'K' : 'P'}${String(bill?.bill_number).padStart(3, '0')}</title>
-              <meta charset="UTF-8">
-              <style>
-                /* Import fonts */
-                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-
-                /* Include all existing styles */
-                ${styles}
-
-                /* Override for print window */
-                body {
-                  margin: 0;
-                  padding: 20px;
-                  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-                  background: white;
-                  color: black;
-                  line-height: 1.5;
-                }
-
-                .bill-display {
-                  margin: 0 auto;
-                  max-width: none !important;
-                  width: 100% !important;
-                  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
-                  border-radius: 0.5rem !important;
-                  border: 1px solid #e5e7eb !important;
-                  background: white !important;
-                }
-
-                /* Ensure colors print correctly */
-                * {
-                  -webkit-print-color-adjust: exact !important;
-                  print-color-adjust: exact !important;
-                  color-adjust: exact !important;
-                }
-
-                /* Red text should remain red */
-                .text-red-600 {
-                  color: #dc2626 !important;
-                }
-
-                .text-red-500 {
-                  color: #ef4444 !important;
-                }
-
-                .border-red-600 {
-                  border-color: #dc2626 !important;
-                }
-
-                /* Table styling */
-                table {
-                  border-collapse: collapse !important;
-                  width: 100% !important;
-                }
-
-                th, td {
-                  border: 1px solid #d1d5db !important;
-                  padding: 8px !important;
-                }
-
-                th {
-                  background-color: #f9fafb !important;
-                  font-weight: bold !important;
-                }
-
-                /* Button styling - hide in print */
-                button {
-                  display: none !important;
-                }
-
-                @media print {
-                  body {
-                    margin: 0;
-                    padding: 15mm;
-                    background: white !important;
-                  }
-
-                  .bill-display {
-                    box-shadow: none !important;
-                    border: 1px solid #000 !important;
-                    margin: 0 !important;
-                    width: 100% !important;
-                    max-width: none !important;
-                  }
-
-                  /* Preserve red colors for printing */
-                  .text-red-600 {
-                    color: #dc2626 !important;
-                  }
-
-                  .text-red-500 {
-                    color: #ef4444 !important;
-                  }
-
-                  .bg-red-600 {
-                    background-color: #dc2626 !important;
-                    color: white !important;
-                  }
-
-                  /* Make sure borders are visible */
-                  .border-t,
-                  .border-b,
-                  .border-l,
-                  .border-r {
-                    border-color: #000 !important;
-                  }
-
-                  .border-red-600 {
-                    border-color: #dc2626 !important;
-                  }
-                }
-              </style>
-            </head>
-            <body>
-              <div class="bill-display">
-                ${billHTML.replace(/<button[^>]*>.*?<\/button>/g, '')}
-              </div>
-            </body>
-          </html>
-        `)
-
-        printWindow.document.close()
-
-        // Wait for content to load then print
-        printWindow.onload = () => {
-          setTimeout(() => {
-            printWindow.print()
-            // Don't close immediately to allow print dialog
-            setTimeout(() => {
-              if (!printWindow.closed) {
-                printWindow.close()
-              }
-            }, 1000)
-          }, 500)
+        // Create download link
+        const a = document.createElement('a')
+        const billNum = String(bill?.bill_number)
+        let filename: string
+        if (billNum.startsWith('P') || billNum.startsWith('K')) {
+          filename = `Bill_${billNum}.pdf`
+        } else {
+          const prefix = bill?.bill_type === 'kacchi' ? 'K' : 'P'
+          filename = `Bill_${prefix}${billNum.padStart(3, '0')}.pdf`
         }
 
-        // Fallback in case onload doesn't fire
-        setTimeout(() => {
-          if (!printWindow.closed) {
-            printWindow.print()
-            setTimeout(() => {
-              if (!printWindow.closed) {
-                printWindow.close()
-              }
-            }, 1000)
-          }
-        }, 1500)
+        a.href = url
+        a.download = filename
+        document.body.appendChild(a)
+        a.click()
+
+        // Cleanup
+        window.URL.revokeObjectURL(url)
+        document.body.removeChild(a)
+
+        toast.success('PDF downloaded successfully!', { id: 'print' })
       } else {
-        printWindow.close()
-        toast.error('Bill content not found')
+        const errorText = await response.text()
+        console.error('PDF generation failed:', errorText)
+        toast.error('Failed to generate PDF', { id: 'print' })
       }
-    } else {
-      toast.error('Please allow popups to print the bill')
+    } catch (error) {
+      console.error('Error generating PDF:', error)
+      toast.error('Error generating PDF', { id: 'print' })
     }
   }
 
@@ -330,7 +176,7 @@ export default function BillDetailPage() {
 
   return (
     <ProtectedRoute>
-      <div className="container mx-auto px-4 py-6 md:py-8">
+      <div className="container py-6 md:py-8">
         {/* Responsive Header */}
         <div className="mb-4 md:mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 hidden-print">
           <div className="flex items-center gap-4 min-w-0 flex-1">

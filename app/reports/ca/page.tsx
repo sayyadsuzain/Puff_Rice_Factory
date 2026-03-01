@@ -58,6 +58,7 @@ const MONTHS = [
   { value: 11, label: 'November' },
   { value: 12, label: 'December' },
   { value: 1, label: 'January' },
+  { value: 2, label: 'February' },
   { value: 3, label: 'March' },
 ]
 const FINANCIAL_YEARS = ['2024-25', '2025-26', '2026-27', '2027-28']
@@ -510,7 +511,7 @@ export default function MonthlyBillBookPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-6 md:py-8">
+    <div className="container py-6 md:py-8">
       {/* Back Button */}
       <div className="mb-6">
         <Button
@@ -535,11 +536,11 @@ export default function MonthlyBillBookPage() {
           <CardDescription>Choose the period for which you want to generate the bill book</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <div>
               <label className="text-sm font-medium mb-2 block">Financial Year</label>
               <Select value={selectedFY} onValueChange={setSelectedFY}>
-                <SelectTrigger>
+                <SelectTrigger suppressHydrationWarning>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -553,7 +554,7 @@ export default function MonthlyBillBookPage() {
             <div>
               <label className="text-sm font-medium mb-2 block">Month</label>
               <Select value={selectedMonth.toString()} onValueChange={(value) => setSelectedMonth(parseInt(value))}>
-                <SelectTrigger>
+                <SelectTrigger suppressHydrationWarning>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -587,7 +588,7 @@ export default function MonthlyBillBookPage() {
               {/* Monthly Bill Books */}
               <div>
                 <h4 className="font-medium mb-3 text-sm text-gray-700">Monthly Bill Books (Selected Month)</h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                   <Button
                     onClick={generateMonthlyBillBookPDF}
                     disabled={generatingMonthly || generatingYearly || generatingMonthlyKacchi || generatingMonthlyPakki || generatingYearlyKacchi || generatingYearlyPakki}
@@ -618,7 +619,7 @@ export default function MonthlyBillBookPage() {
               {/* Yearly Bill Books */}
               <div>
                 <h4 className="font-medium mb-3 text-sm text-gray-700">Yearly Bill Books (Full Financial Year)</h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                   <Button
                     onClick={generateYearlyBillBookPDF}
                     variant="outline"

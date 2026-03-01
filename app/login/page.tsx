@@ -11,10 +11,10 @@ import { useAuth } from '@/components/auth-provider'
 import { toast } from 'sonner'
 import { Eye, EyeOff } from 'lucide-react'
 
-// List of allowed users
-const ALLOWED_USERS = [
-  'mstradingcompany9001@gmail.com'
-]
+// List of allowed users (removed validation - any Supabase user can now login)
+// const ALLOWED_USERS = [
+//   'mstc9001@gmail.com'
+// ]
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -32,12 +32,6 @@ export default function LoginPage() {
       return
     }
 
-    // Check if email matches the authorized user
-    if (email.toLowerCase() !== 'mstradingcompany9001@gmail.com') {
-      toast.error('Access denied. Only authorized user can access this system.')
-      return
-    }
-
     setLoading(true)
     try {
       await signIn(email, password)
@@ -50,24 +44,24 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-6 sm:space-y-8">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-red-600">MS TRADING</h1>
-          <p className="mt-2 text-sm text-gray-600">Bill Management System</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-red-600">MS TRADING COMPANY</h1>
+          <p className="mt-2 text-sm sm:text-base text-gray-600">Bill Management System</p>
           <p className="mt-1 text-xs text-gray-500">Authorized Personnel Only</p>
         </div>
 
         <Card>
-          <CardHeader className="text-center">
-            <CardTitle>Sign In</CardTitle>
-            <CardDescription>
+          <CardHeader className="text-center space-y-2">
+            <CardTitle className="text-xl sm:text-2xl">Sign In</CardTitle>
+            <CardDescription className="text-sm">
               Enter your credentials to access the bill management system
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <form onSubmit={handleSignIn} className="space-y-4">
-              <div className="space-y-2">
+            <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
@@ -77,7 +71,6 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                 />
-                <p className="text-xs text-gray-500">Only authorized users can access this system</p>
               </div>
 
               <div className="space-y-2">
@@ -115,7 +108,7 @@ export default function LoginPage() {
             <div className="mt-6 text-center">
               <div className="text-sm text-gray-600">
                 <p className="font-medium">Authorized User:</p>
-                <p className="mt-2 text-xs font-mono">mstradingcompany9001@gmail.com</p>
+                <p className="mt-2 text-sm font-semibold text-red-600">MS TRADING COMPANY</p>
               </div>
             </div>
           </CardContent>

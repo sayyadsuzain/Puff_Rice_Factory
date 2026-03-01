@@ -3,7 +3,13 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = 'https://wvhswztjjahhbdtxnhxb.supabase.co'
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind2aHN3enRqamFoaGJkdHhuaHhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4MzA5NDMsImV4cCI6MjA4NzQwNjk0M30.Cw4V-eU2jcOmH8CRrk9HvPHdgAF3IfOtMtGoW6To0JI'
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true
+  }
+})
 
 export type Party = {
   id: number
