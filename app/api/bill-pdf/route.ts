@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import puppeteer from 'puppeteer-core'
+import chromium from '@sparticuz/chromium'
 import { supabase } from '@/lib/supabase'
 
 export const runtime = 'nodejs'
@@ -380,9 +381,10 @@ export async function GET(request: NextRequest) {
     console.log('🎨 BILL-PDF: Starting Puppeteer...')
 
     const browser = await puppeteer.launch({
-      executablePath: "/usr/bin/chromium",
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      headless: true,
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
     })
 
     console.log('✅ BILL-PDF: Puppeteer launched successfully')

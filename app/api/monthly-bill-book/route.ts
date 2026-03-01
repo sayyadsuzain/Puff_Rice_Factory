@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import puppeteer from 'puppeteer-core'
+import chromium from '@sparticuz/chromium'
 import { supabase, numberToWords } from '@/lib/supabase'
 import { LOGO_BASE64 } from '@/lib/logo-base64'
 
@@ -437,9 +438,10 @@ export async function POST(request: NextRequest) {
     `
 
     const browser = await puppeteer.launch({
-      executablePath: "/usr/bin/chromium",
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      headless: true,
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
     })
 
     const page = await browser.newPage()
