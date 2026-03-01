@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import puppeteer from 'puppeteer-core'
-import chromium from '@sparticuz/chromium'
+import puppeteer from 'puppeteer'
 import { supabase } from '@/lib/supabase'
 
 export const runtime = 'nodejs'
@@ -380,19 +379,11 @@ export async function GET(request: NextRequest) {
 
     console.log('🎨 BILL-PDF: Starting Puppeteer...')
 
-    const isProd = process.env.NODE_ENV === 'production'
-
-    const executablePath = isProd
-      ? await chromium.executablePath()
-      : 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
-
-    const browser = await puppeteer.launch({
-      args: isProd ? chromium.args : [],
-      executablePath,
-      headless: true,
+    const browser = await puppeteer.connect({
+      browserWSEndpoint: `wss://chrome.browserless.io?token=${process.env.BROWSERLESS_TOKEN}`,
     })
 
-    console.log('✅ BILL-PDF: Puppeteer launched successfully')
+    console.log('✅ BILL-PDF: Connected to Browserless successfully')
 
     const page = await browser.newPage()
     await page.setContent(fullHTML, { waitUntil: 'networkidle0' })

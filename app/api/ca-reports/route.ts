@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import puppeteer from 'puppeteer-core'
-import chromium from '@sparticuz/chromium'
+import puppeteer from 'puppeteer'
 import { supabase } from '@/lib/supabase'
 
 export const runtime = 'nodejs'
@@ -52,16 +51,8 @@ export async function POST(request: NextRequest) {
     })
 
     // Generate PDF
-    const isProd = process.env.NODE_ENV === 'production'
-
-    const executablePath = isProd
-      ? await chromium.executablePath()
-      : 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
-
-    const browser = await puppeteer.launch({
-      args: isProd ? chromium.args : [],
-      executablePath,
-      headless: true,
+    const browser = await puppeteer.connect({
+      browserWSEndpoint: `wss://chrome.browserless.io?token=${process.env.BROWSERLESS_TOKEN}`,
     })
 
     const page = await browser.newPage()
