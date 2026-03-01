@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { launchBrowser } from '@/lib/puppeteer-config'
+import puppeteer from 'puppeteer-core'
+import chromium from '@sparticuz/chromium'
 import { supabase, numberToWords } from '@/lib/supabase'
 import { LOGO_BASE64 } from '@/lib/logo-base64'
 
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {
@@ -435,7 +437,16 @@ export async function POST(request: NextRequest) {
       </html>
     `
 
-    const browser = await launchBrowser()
+    const isProd = process.env.NODE_ENV === 'production'
+
+    const browser = await puppeteer.launch({
+      args: isProd ? chromium.args : [],
+      defaultViewport: chromium.defaultViewport,
+      executablePath: isProd
+        ? await chromium.executablePath()
+        : undefined,
+      headless: true,
+    })
 
     const page = await browser.newPage()
     await page.setContent(fullHTML, { waitUntil: 'networkidle0' })

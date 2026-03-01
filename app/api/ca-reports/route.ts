@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { launchBrowser } from '@/lib/puppeteer-config'
+import puppeteer from 'puppeteer-core'
+import chromium from '@sparticuz/chromium'
 import { supabase } from '@/lib/supabase'
 
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {
@@ -50,7 +52,16 @@ export async function POST(request: NextRequest) {
     })
 
     // Generate PDF
-    const browser = await launchBrowser()
+    const isProd = process.env.NODE_ENV === 'production'
+
+    const browser = await puppeteer.launch({
+      args: isProd ? chromium.args : [],
+      defaultViewport: chromium.defaultViewport,
+      executablePath: isProd
+        ? await chromium.executablePath()
+        : undefined,
+      headless: true,
+    })
 
     const page = await browser.newPage()
     await page.setContent(reportHTML, { waitUntil: 'networkidle0' })

@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { launchBrowser } from '@/lib/puppeteer-config'
+import puppeteer from 'puppeteer-core'
+import chromium from '@sparticuz/chromium'
 import { supabase } from '@/lib/supabase'
 
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
 
 function numberToWords(num: number): string {
@@ -377,7 +379,17 @@ export async function GET(request: NextRequest) {
     `
 
     console.log('🎨 BILL-PDF: Starting Puppeteer...')
-    const browser = await launchBrowser()
+
+    const isProd = process.env.NODE_ENV === 'production'
+
+    const browser = await puppeteer.launch({
+      args: isProd ? chromium.args : [],
+      defaultViewport: chromium.defaultViewport,
+      executablePath: isProd
+        ? await chromium.executablePath()
+        : undefined,
+      headless: true,
+    })
 
     console.log('✅ BILL-PDF: Puppeteer launched successfully')
 
