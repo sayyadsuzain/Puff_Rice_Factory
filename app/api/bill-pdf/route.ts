@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import puppeteer from 'puppeteer'
+import puppeteer from 'puppeteer-core'
 import { supabase } from '@/lib/supabase'
 
 export const runtime = 'nodejs'
@@ -380,9 +380,7 @@ export async function GET(request: NextRequest) {
     console.log('🎨 BILL-PDF: Starting Puppeteer...')
 
     const browser = await puppeteer.launch({
-      executablePath:
-        process.env.PUPPETEER_EXECUTABLE_PATH ||
-        "/opt/render/.cache/puppeteer/chrome/linux-145.0.7632.77/chrome-linux64/chrome",
+      executablePath: "/usr/bin/chromium",
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
       headless: true,
     })
