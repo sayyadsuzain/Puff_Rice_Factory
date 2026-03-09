@@ -204,8 +204,103 @@ export default function BillsPage() {
                 <p className="text-sm md:text-base text-muted-foreground">No bills found</p>
               </div>
             ) : (
-              <div className="overflow-x-auto -mx-4 md:mx-0">
-                <div className="inline-block min-w-full align-middle">
+              <div>
+                {/* Mobile/Tablet Card View (shown on screens < md) */}
+                <div className="grid grid-cols-1 gap-4 md:hidden">
+                  {filteredBills.map((bill) => (
+                    <Card key={bill.id} className="overflow-hidden border-l-4 shadow-sm" style={{ borderLeftColor: bill.bill_type === 'kacchi' ? '#ef4444' : '#6366f1' }}>
+                      <CardContent className="p-4">
+                        <div className="flex justify-between items-start mb-3">
+                          <div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-lg font-bold">
+                                {(() => {
+                                  const billNum = String(bill.bill_number)
+                                  if (billNum.startsWith('P') || billNum.startsWith('K')) {
+                                    const numPart = billNum.substring(1)
+                                    return billNum.charAt(0) + numPart.padStart(3, '0')
+                                  } else {
+                                    const prefix = bill.bill_type === 'kacchi' ? 'K' : 'P'
+                                    return `${prefix}${billNum.padStart(3, '0')}`
+                                  }
+                                })()}
+                              </span>
+                              <Badge variant={bill.bill_type === 'kacchi' ? 'default' : 'secondary'} className="text-[10px] h-5">
+                                {bill.bill_type === 'kacchi' ? 'Kacchi' : 'Pakki'}
+                              </Badge>
+                            </div>
+                            <p className="text-sm font-medium text-gray-900 line-clamp-1">
+                              {bill.parties?.name || 'Unknown Party'}
+                            </p>
+                            <p className="text-xs text-gray-500">{formatDate(bill.bill_date)}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm font-bold text-gray-900">₹{bill.total_amount.toFixed(2)}</p>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2 mt-4">
+                          <Link href={`/bills/${bill.id}`} className="w-full">
+                            <Button variant="outline" size="sm" className="w-full gap-2 h-9">
+                              <Eye className="h-4 w-4" />
+                              View
+                            </Button>
+                          </Link>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full gap-2 h-9"
+                            onClick={() => handleEdit(bill.id)}
+                          >
+                            <Edit2 className="h-4 w-4" />
+                            Edit
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full gap-2 h-9"
+                            onClick={() => handlePrint(bill.id)}
+                          >
+                            <Printer className="h-4 w-4" />
+                            Print
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="w-full gap-2 h-9 text-red-600 border-red-100 hover:bg-red-50 hover:text-red-700 hover:border-red-200"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                                Delete
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent className="mx-4 max-w-[90vw] rounded-lg">
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Delete Bill</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Permanently delete bill {bill.bill_number}? This cannot be undone.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter className="gap-2">
+                                <AlertDialogCancel className="w-full">Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => handleDelete(bill.id, bill.bill_number)}
+                                  className="w-full bg-red-600 hover:bg-red-700"
+                                >
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+
+                {/* Desktop Table View (shown on screens >= md) */}
+                <div className="hidden md:block overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -223,12 +318,10 @@ export default function BillsPage() {
                           <TableCell className="font-semibold whitespace-nowrap">
                             {(() => {
                               const billNum = String(bill.bill_number)
-                              // Check if bill_number already has prefix (old format: "P001", new format: "1")
                               if (billNum.startsWith('P') || billNum.startsWith('K')) {
                                 const numPart = billNum.substring(1)
                                 return billNum.charAt(0) + numPart.padStart(3, '0')
                               } else {
-                                // New format: just number, add prefix
                                 const prefix = bill.bill_type === 'kacchi' ? 'K' : 'P'
                                 return `${prefix}${billNum.padStart(3, '0')}`
                               }
@@ -249,84 +342,59 @@ export default function BillsPage() {
                             </Badge>
                           </TableCell>
                           <TableCell className="text-right">
-                            {/* Mobile: Stack buttons vertically, Desktop: Horizontal */}
-                            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2">
-                              <div className="flex gap-2">
-                                <Link href={`/bills/${bill.id}`}>
-                                  <Button variant="outline" size="sm" className="w-full sm:w-auto gap-1 px-2 md:px-3">
-                                    <Eye className="h-3 w-3 md:h-4 md:w-4" />
-                                    <span className="hidden xs:inline">View</span>
+                            <div className="flex items-center justify-end gap-2">
+                              <Link href={`/bills/${bill.id}`}>
+                                <Button variant="outline" size="sm" className="h-8 w-8 p-0" title="View">
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                              </Link>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-8 w-8 p-0"
+                                onClick={() => handleEdit(bill.id)}
+                                title="Edit"
+                              >
+                                <Edit2 className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-8 w-8 p-0"
+                                onClick={() => handlePrint(bill.id)}
+                                title="Print"
+                              >
+                                <Printer className="h-4 w-4" />
+                              </Button>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+                                    title="Delete"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
                                   </Button>
-                                </Link>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="w-full sm:w-auto gap-1 px-2 md:px-3"
-                                  onClick={() => handleEdit(bill.id)}
-                                >
-                                  <Edit2 className="h-3 w-3 md:h-4 md:w-4" />
-                                  <span className="hidden xs:inline">Edit</span>
-                                </Button>
-                              </div>
-                              <div className="flex gap-2">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="w-full sm:w-auto gap-1 px-2 md:px-3"
-                                  onClick={() => handlePrint(bill.id)}
-                                >
-                                  <Printer className="h-3 w-3 md:h-4 md:w-4" />
-                                  <span className="hidden xs:inline">Print</span>
-                                </Button>
-                                <AlertDialog>
-                                  <AlertDialogTrigger asChild>
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      className="w-full sm:w-auto gap-1 px-2 md:px-3 text-red-600 hover:text-red-700"
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Delete Bill</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Are you sure you want to delete bill {bill.bill_number}?
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() => handleDelete(bill.id, bill.bill_number)}
+                                      className="bg-red-600 hover:bg-red-700"
                                     >
-                                      <Trash2 className="h-3 w-3 md:h-4 md:w-4" />
-                                      <span className="hidden xs:inline">Delete</span>
-                                    </Button>
-                                  </AlertDialogTrigger>
-                                  <AlertDialogContent className="mx-4">
-                                    <AlertDialogHeader>
-                                      <AlertDialogTitle className="text-base md:text-lg">Delete Bill</AlertDialogTitle>
-                                      <AlertDialogDescription className="text-sm md:text-base">
-                                        Are you sure you want to delete bill {(() => {
-                                          const billNum = String(bill.bill_number)
-                                          if (billNum.startsWith('P') || billNum.startsWith('K')) {
-                                            const numPart = billNum.substring(1)
-                                            return billNum.charAt(0) + numPart.padStart(3, '0')
-                                          } else {
-                                            const prefix = bill.bill_type === 'kacchi' ? 'K' : 'P'
-                                            return `${prefix}${billNum.padStart(3, '0')}`
-                                          }
-                                        })()}?
-                                        This action cannot be undone and will permanently remove the bill and all its items.
-                                      </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter className="flex-col sm:flex-row gap-2">
-                                      <AlertDialogCancel className="w-full sm:w-auto">Cancel</AlertDialogCancel>
-                                      <AlertDialogAction
-                                        onClick={() => handleDelete(bill.id, (() => {
-                                          const billNum = String(bill.bill_number)
-                                          if (billNum.startsWith('P') || billNum.startsWith('K')) {
-                                            const numPart = billNum.substring(1)
-                                            return billNum.charAt(0) + numPart.padStart(3, '0')
-                                          } else {
-                                            const prefix = bill.bill_type === 'kacchi' ? 'K' : 'P'
-                                            return `${prefix}${billNum.padStart(3, '0')}`
-                                          }
-                                        })())}
-                                        className="w-full sm:w-auto bg-red-600 hover:bg-red-700"
-                                      >
-                                        Delete
-                                      </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                  </AlertDialogContent>
-                                </AlertDialog>
-                              </div>
+                                      Delete
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
                             </div>
                           </TableCell>
                         </TableRow>
