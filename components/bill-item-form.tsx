@@ -23,7 +23,7 @@ export default function BillItemForm({ index, item, onUpdate, onRemove }: BillIt
     setIsPaddyMode(isPaddy)
   }, [item.particular])
 
-  const handleParticulaChange = (value: string) => {
+  const handleParticularChange = (value: string) => {
     const isPaddy = value.toLowerCase().includes('paddy')
     setIsPaddyMode(isPaddy)
     onUpdate({ ...item, particular: value })
@@ -92,7 +92,7 @@ export default function BillItemForm({ index, item, onUpdate, onRemove }: BillIt
           <div className="space-y-2">
             <Label className="text-xs md:text-sm">Product (Type or Select)</Label>
             <div className="flex flex-col sm:flex-row gap-2">
-              <Select value={item.particular === undefined ? '' : item.particular} onValueChange={handleParticulaChange}>
+              <Select value={item.particular === undefined ? '' : item.particular} onValueChange={handleParticularChange}>
                 <SelectTrigger className="flex-1 text-sm md:text-base">
                   <SelectValue placeholder="Select..." />
                 </SelectTrigger>
@@ -107,7 +107,7 @@ export default function BillItemForm({ index, item, onUpdate, onRemove }: BillIt
               <Input
                 placeholder="Custom"
                 value={item.particular || ''}
-                onChange={(e) => handleParticulaChange(e.target.value)}
+                onChange={(e) => handleParticularChange(e.target.value)}
                 className="flex-1 text-sm md:text-base"
               />
             </div>
