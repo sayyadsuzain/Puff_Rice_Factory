@@ -1,7 +1,8 @@
-import { Bill, BillItem, COMPANY_INFO, formatDate } from '@/lib/supabase'
+import { Bill, BillItem, COMPANY_INFO, formatDate, supabase } from '@/lib/supabase'
 import { numberToWords } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Printer } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface BillDisplayProps {
   bill: Bill
@@ -22,12 +23,46 @@ export default function BillDisplay({ bill, items, partyName, partyGst }: BillDi
   const handlePrint = async () => {
     try {
       console.log('🎨 BILL-PDF: Generating PDF for bill ID:', bill.id)
-      // Open the Puppeteer-generated PDF inline in browser
-      const pdfUrl = `/api/bill-pdf?id=${bill.id}`
-      window.open(pdfUrl, '_blank')
+      toast.loading('Generating PDF...', { id: 'print' })
+
+      // Get current session for authentication
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token
+
+      // Call the individual bill PDF API endpoint with auth header
+      const response = await fetch(`/api/bill-pdf?id=${bill.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+
+      if (response.ok) {
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
+
+        // Create download link
+        const a = document.createElement('a')
+        const billNum = String(bill.bill_number)
+        let filename = `Bill_${billNum}.pdf`
+        
+        a.href = url
+        a.download = filename
+        document.body.appendChild(a)
+        a.click()
+
+        // Cleanup
+        window.URL.revokeObjectURL(url)
+        document.body.removeChild(a)
+
+        toast.success('PDF downloaded successfully!', { id: 'print' })
+      } else {
+        const errorText = await response.text()
+        console.error('❌ BILL-PDF: PDF generation failed:', errorText)
+        toast.error('Failed to generate PDF', { id: 'print' })
+      }
     } catch (error) {
       console.error('❌ BILL-PDF: Error generating PDF:', error)
-      alert('Failed to generate PDF. Please try again.')
+      toast.error('Error generating PDF', { id: 'print' })
     }
   }
 

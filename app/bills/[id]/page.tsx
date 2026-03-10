@@ -94,8 +94,16 @@ export default function BillDetailPage() {
     try {
       toast.loading('Generating PDF...', { id: 'print' })
 
-      // Call the individual bill PDF API endpoint
-      const response = await fetch(`/api/bill-pdf?id=${billId}`)
+      // Get current session for authentication
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token
+
+      // Call the individual bill PDF API endpoint with auth header
+      const response = await fetch(`/api/bill-pdf?id=${billId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
 
       if (response.ok) {
         const blob = await response.blob()

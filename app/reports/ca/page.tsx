@@ -247,9 +247,16 @@ export default function MonthlyBillBookPage() {
 
     setGeneratingMonthly(true)
     try {
+      // Get current session for authentication
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token
+
       const response = await fetch('/api/monthly-bill-book', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
           financialYear: selectedFY,
           month: selectedMonth,
@@ -289,9 +296,16 @@ export default function MonthlyBillBookPage() {
 
     setGeneratingYearly(true)
     try {
+      // Get current session for authentication
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token
+
       const response = await fetch('/api/monthly-bill-book', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
           financialYear: selectedFY,
           mode: 'yearly'
@@ -329,9 +343,16 @@ export default function MonthlyBillBookPage() {
 
     setGeneratingMonthlyKacchi(true)
     try {
+      // Get current session for authentication
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token
+
       const response = await fetch('/api/monthly-bill-book', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
           financialYear: selectedFY,
           month: selectedMonth,
@@ -373,9 +394,16 @@ export default function MonthlyBillBookPage() {
 
     setGeneratingMonthlyPakki(true)
     try {
+      // Get current session for authentication
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token
+
       const response = await fetch('/api/monthly-bill-book', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
           financialYear: selectedFY,
           month: selectedMonth,
@@ -417,9 +445,16 @@ export default function MonthlyBillBookPage() {
 
     setGeneratingYearlyKacchi(true)
     try {
+      // Get current session for authentication
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token
+
       const response = await fetch('/api/monthly-bill-book', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
           financialYear: selectedFY,
           mode: 'yearly',
@@ -460,9 +495,16 @@ export default function MonthlyBillBookPage() {
 
     setGeneratingYearlyPakki(true)
     try {
+      // Get current session for authentication
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token
+
       const response = await fetch('/api/monthly-bill-book', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
           financialYear: selectedFY,
           mode: 'yearly',

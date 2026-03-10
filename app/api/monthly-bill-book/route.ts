@@ -23,6 +23,17 @@ export async function POST(request: NextRequest) {
       },
     })
 
+    // 1. Core Fix: Check for Authorization header first (Bearer Token)
+    const authHeader = request.headers.get('Authorization')
+    if (authHeader?.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1]
+      console.log('📊 MONTHLY-PDF: Found Bearer token, setting session...')
+      await supabase.auth.setSession({
+        access_token: token,
+        refresh_token: '', // Not needed for single request
+      })
+    }
+
     // Verify authentication status for core diagnostics
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     console.log('📊 MONTHLY-PDF: Auth check:', user ? `Authenticated as ${user.email}` : 'Not authenticated', authError ? `Auth error: ${authError.message}` : '')
