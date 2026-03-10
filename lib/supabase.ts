@@ -95,17 +95,30 @@ export const formatDate = (dateStr: string): string => {
 
 export const formatDateTime = (dateStr: string): string => {
   if (!dateStr) return '---'
+  
   try {
-    const date = new Date(dateStr)
-    return date.toLocaleString('en-IN', {
+    // 1. Force UTC normalization
+    // Supabase often returns 'YYYY-MM-DD HH:MM:SS.mmm+00'
+    // We normalize spaces to 'T' and ensure it ends with 'Z' if no timezone is present
+    let normalized = dateStr.trim().replace(' ', 'T')
+    if (!normalized.includes('Z') && !normalized.includes('+')) {
+      normalized += 'Z'
+    }
+    
+    const date = new Date(normalized)
+
+    // 2. Explicitly convert to IST using Intl API
+    return new Intl.DateTimeFormat('en-IN', {
+      timeZone: 'Asia/Kolkata',
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
       hour12: true
-    })
+    }).format(date).replace(',', '')
   } catch (e) {
+    console.error('Core IST formatting failed:', e)
     return dateStr
   }
 }
