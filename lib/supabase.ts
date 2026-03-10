@@ -95,12 +95,9 @@ export const formatDate = (dateStr: string): string => {
 
 export const formatDateTime = (dateStr: string): string => {
   if (!dateStr) return '---'
-  
   try {
     const date = new Date(dateStr)
-    // Use Intl.DateTimeFormat with explicit IST timezone
-    const formatter = new Intl.DateTimeFormat('en-IN', {
-      timeZone: 'Asia/Kolkata',
+    return date.toLocaleString('en-IN', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
@@ -108,24 +105,8 @@ export const formatDateTime = (dateStr: string): string => {
       minute: '2-digit',
       hour12: true
     })
-    
-    // Format and add IST suffix for 100% clarity
-    return formatter.format(date).replace(',', '') + ' IST'
   } catch (e) {
-    // Ultimate fallback: Manual UTC+5:30 offset
-    console.error('Intl formatting failed, using manual fallback:', e)
-    const utcDate = new Date(dateStr)
-    const istDate = new Date(utcDate.getTime() + 5.5 * 60 * 60 * 1000)
-    
-    const d = String(istDate.getUTCDate()).padStart(2, '0')
-    const m = String(istDate.getUTCMonth() + 1).padStart(2, '0')
-    const y = istDate.getUTCFullYear()
-    let h = istDate.getUTCHours()
-    const min = String(istDate.getUTCMinutes()).padStart(2, '0')
-    const ampm = h >= 12 ? 'pm' : 'am'
-    h = h % 12 || 12
-    
-    return `${d}/${m}/${y}, ${String(h).padStart(2, '0')}:${min} ${ampm} IST`
+    return dateStr
   }
 }
 
