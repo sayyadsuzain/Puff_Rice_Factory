@@ -94,16 +94,25 @@ export const formatDate = (dateStr: string): string => {
 }
 
 export const formatDateTime = (dateStr: string): string => {
-  const date = new Date(dateStr)
-  return date.toLocaleString('en-IN', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true,
-    timeZone: 'Asia/Kolkata'  // Always show IST regardless of server timezone
-  })
+  // Convert UTC to IST (UTC+5:30) explicitly
+  const utcDate = new Date(dateStr)
+  // Add 5 hours 30 minutes to get IST
+  const istOffset = 5.5 * 60 * 60 * 1000 // 5.5 hours in ms
+  const istDate = new Date(utcDate.getTime() + istOffset)
+
+  // Format the IST date manually
+  const dd = String(istDate.getUTCDate()).padStart(2, '0')
+  const mm = String(istDate.getUTCMonth() + 1).padStart(2, '0')
+  const yyyy = istDate.getUTCFullYear()
+  
+  let hours = istDate.getUTCHours()
+  const minutes = String(istDate.getUTCMinutes()).padStart(2, '0')
+  const ampm = hours >= 12 ? 'pm' : 'am'
+  hours = hours % 12
+  if (hours === 0) hours = 12
+  const hh = String(hours).padStart(2, '0')
+
+  return `${dd}/${mm}/${yyyy}, ${hh}:${minutes} ${ampm}`
 }
 
 // Amount to words conversion
