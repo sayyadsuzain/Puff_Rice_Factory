@@ -92,49 +92,17 @@ export default function BillDetailPage() {
     }
 
     try {
-      toast.loading('Generating PDF...', { id: 'print' })
+      toast.loading('Opening PDF preview...', { id: 'print' })
 
       // Get current session for authentication
       const { data: { session } } = await supabase.auth.getSession()
       const token = session?.access_token
 
-      // Call the individual bill PDF API endpoint with auth header
-      const response = await fetch(`/api/bill-pdf?id=${billId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-
-      if (response.ok) {
-        const blob = await response.blob()
-        const url = window.URL.createObjectURL(blob)
-
-        // Create download link
-        const a = document.createElement('a')
-        const billNum = String(bill?.bill_number)
-        let filename: string
-        if (billNum.startsWith('P') || billNum.startsWith('K')) {
-          filename = `Bill_${billNum}.pdf`
-        } else {
-          const prefix = bill?.bill_type === 'kacchi' ? 'K' : 'P'
-          filename = `Bill_${prefix}${billNum.padStart(3, '0')}.pdf`
-        }
-
-        a.href = url
-        a.download = filename
-        document.body.appendChild(a)
-        a.click()
-
-        // Cleanup
-        window.URL.revokeObjectURL(url)
-        document.body.removeChild(a)
-
-        toast.success('PDF downloaded successfully!', { id: 'print' })
-      } else {
-        const errorText = await response.text()
-        console.error('PDF generation failed:', errorText)
-        toast.error('Failed to generate PDF', { id: 'print' })
-      }
+      // Construct URL with auth token for window.open (restores original functionality)
+      const pdfUrl = `/api/bill-pdf?id=${billId}${token ? `&token=${token}` : ''}`
+      
+      window.open(pdfUrl, '_blank')
+      toast.success('PDF preview opened!', { id: 'print' })
     } catch (error) {
       console.error('Error generating PDF:', error)
       toast.error('Error generating PDF', { id: 'print' })

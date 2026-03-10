@@ -51,9 +51,17 @@ export async function GET(request: NextRequest) {
   try {
     console.log('🎨 BILL-PDF: Starting PDF generation process...')
 
-    // 1. Core Fix: Check for Authorization header first (Bearer Token)
+    // 1. Core Fix: Check for Authorization header or 'token' query param
     const authHeader = request.headers.get('Authorization')
-    console.log('🎨 BILL-PDF: Auth header present:', !!authHeader)
+    const queryToken = searchParams.get('token')
+    
+    // Construct the actual auth token to use
+    let authToken = authHeader
+    if (!authToken && queryToken) {
+      authToken = `Bearer ${queryToken}`
+    }
+    
+    console.log('🎨 BILL-PDF: Auth method:', authHeader ? 'Header' : (queryToken ? 'Query' : 'None'))
 
     // Create an authenticated Supabase client for the server-side request
     const cookieStore = await cookies()
@@ -64,7 +72,7 @@ export async function GET(request: NextRequest) {
         },
       },
       global: {
-        headers: authHeader ? { Authorization: authHeader } : undefined
+        headers: authToken ? { Authorization: authToken } : undefined
       }
     })
 
@@ -86,7 +94,8 @@ export async function GET(request: NextRequest) {
         details: billError?.message || 'No bill data returned',
         id: billId,
         auth: user ? 'authenticated' : 'anonymous',
-        authHeader: authHeader ? `${authHeader.substring(0, 15)}...` : 'missing',
+        authMethod: authHeader ? 'header' : (queryToken ? 'query' : 'none'),
+        authProvided: !!authToken,
         hint: 'Check if RLS policies allow this user to read bills'
       }, { status: 404 })
     }

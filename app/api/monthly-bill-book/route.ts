@@ -13,9 +13,18 @@ export async function POST(request: NextRequest) {
   try {
     const { financialYear, month, mode, billType } = await request.json()
 
-    // 1. Core Fix: Check for Authorization header first (Bearer Token)
+    // 1. Core Fix: Check for Authorization header or 'token' query param
     const authHeader = request.headers.get('Authorization')
-    console.log('📊 MONTHLY-PDF: Auth header present:', !!authHeader)
+    const { searchParams } = new URL(request.url)
+    const queryToken = searchParams.get('token')
+    
+    // Construct the actual auth token to use
+    let authToken = authHeader
+    if (!authToken && queryToken) {
+      authToken = `Bearer ${queryToken}`
+    }
+    
+    console.log('📊 MONTHLY-PDF: Auth method:', authHeader ? 'Header' : (queryToken ? 'Query' : 'None'))
 
     // Create an authenticated Supabase client for the server-side request
     const cookieStore = await cookies()
@@ -26,7 +35,7 @@ export async function POST(request: NextRequest) {
         },
       },
       global: {
-        headers: authHeader ? { Authorization: authHeader } : undefined
+        headers: authToken ? { Authorization: authToken } : undefined
       }
     })
 
