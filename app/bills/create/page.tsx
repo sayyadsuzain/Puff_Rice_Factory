@@ -64,10 +64,20 @@ export default function CreateBillPage() {
     fetchNextBillNumber()
     fetchSavedBankDetails()
 
-    // Lock body scroll on mount
+    // Lock body and html scroll on mount
+    const originalBodyOverflow = document.body.style.overflow
+    const originalHtmlOverflow = document.documentElement.style.overflow
+    
     document.body.style.overflow = 'hidden'
+    document.documentElement.style.overflow = 'hidden'
+    document.body.style.height = '100%'
+    document.documentElement.style.height = '100%'
+
     return () => {
-      document.body.style.overflow = 'auto'
+      document.body.style.overflow = originalBodyOverflow
+      document.documentElement.style.overflow = originalHtmlOverflow
+      document.body.style.height = ''
+      document.documentElement.style.height = ''
     }
   }, [])
 
