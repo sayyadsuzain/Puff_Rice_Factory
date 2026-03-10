@@ -101,7 +101,8 @@ export const formatDateTime = (dateStr: string): string => {
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
-    hour12: true
+    hour12: true,
+    timeZone: 'Asia/Kolkata'  // Always show IST regardless of server timezone
   })
 }
 
