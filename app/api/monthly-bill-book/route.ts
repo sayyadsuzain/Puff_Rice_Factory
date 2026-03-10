@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import puppeteer from 'puppeteer-core'
 import chromium from '@sparticuz/chromium'
-import { supabase, numberToWords } from '@/lib/supabase'
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
+import { supabaseUrl, supabaseAnonKey, numberToWords } from '@/lib/supabase'
 import { LOGO_BASE64 } from '@/lib/logo-base64'
 
 export const runtime = 'nodejs'
@@ -10,6 +12,16 @@ export const dynamic = 'force-dynamic'
 export async function POST(request: NextRequest) {
   try {
     const { financialYear, month, mode, billType } = await request.json()
+
+    // Create an authenticated Supabase client for the server-side request
+    const cookieStore = await cookies()
+    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value
+        },
+      },
+    })
 
     let query = supabase
       .from('bills')
@@ -444,7 +456,7 @@ export async function POST(request: NextRequest) {
         args: chromium.args,
         defaultViewport: chromium.defaultViewport,
         executablePath: await chromium.executablePath(),
-        headless: chromium.headless,
+        headless: chromium.headless as any,
         ignoreHTTPSErrors: true,
       })
 
@@ -468,7 +480,7 @@ export async function POST(request: NextRequest) {
         ? `${billType && billType !== 'both' ? billType.charAt(0).toUpperCase() + billType.slice(1) + '_' : ''}BillBook_${getMonthName(month)}_${financialYear}.pdf`
         : `${billType && billType !== 'both' ? billType.charAt(0).toUpperCase() + billType.slice(1) + '_' : ''}YearlyBillBook_${financialYear}.pdf`
 
-      return new NextResponse(pdf, {
+      return new NextResponse(pdf as any, {
         headers: {
           'Content-Type': 'application/pdf',
           'Content-Disposition': `attachment; filename=${filename}`

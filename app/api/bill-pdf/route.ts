@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import puppeteer from 'puppeteer-core'
 import chromium from '@sparticuz/chromium'
-import { supabase } from '@/lib/supabase'
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
+import { supabaseUrl, supabaseAnonKey } from '@/lib/supabase'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -48,6 +50,16 @@ export async function GET(request: NextRequest) {
 
   try {
     console.log('🎨 BILL-PDF: Starting PDF generation process...')
+
+    // Create an authenticated Supabase client for the server-side request
+    const cookieStore = await cookies()
+    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value
+        },
+      },
+    })
 
     // Fetch bill with party data
     const { data: bill, error: billError } = await supabase
@@ -387,7 +399,7 @@ export async function GET(request: NextRequest) {
         args: chromium.args,
         defaultViewport: chromium.defaultViewport,
         executablePath: await chromium.executablePath(),
-        headless: chromium.headless,
+        headless: chromium.headless as any,
         ignoreHTTPSErrors: true,
       })
 
@@ -414,7 +426,7 @@ export async function GET(request: NextRequest) {
       const filename = `Bill_${bill.bill_number}.pdf`
       console.log('✅ BILL-PDF: PDF generated successfully, filename:', filename)
 
-      return new NextResponse(pdf, {
+      return new NextResponse(pdf as any, {
         headers: {
           'Content-Type': 'application/pdf',
           'Content-Disposition': `inline; filename=${filename}`
