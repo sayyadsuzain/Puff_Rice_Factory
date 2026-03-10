@@ -308,12 +308,6 @@ export default function BillDetailPage() {
                     <p className="text-base md:text-lg font-semibold break-all">{bill.vehicle_number}</p>
                   </div>
                 )}
-                {bill.balance !== null && bill.balance !== undefined && bill.balance > 0 && (
-                  <div>
-                    <p className="text-xs md:text-sm text-muted-foreground">Balance</p>
-                    <p className="text-base md:text-lg font-semibold">₹{bill.balance.toFixed(2)}</p>
-                  </div>
-                )}
                 <div>
                   <p className="text-xs md:text-sm text-muted-foreground">Total Amount</p>
                   <p className="text-xl md:text-2xl font-bold">₹{bill.total_amount.toFixed(2)}</p>

@@ -13,6 +13,10 @@ export async function POST(request: NextRequest) {
   try {
     const { financialYear, month, mode, billType } = await request.json()
 
+    // 1. Core Fix: Check for Authorization header first (Bearer Token)
+    const authHeader = request.headers.get('Authorization')
+    console.log('📊 MONTHLY-PDF: Auth header present:', !!authHeader)
+
     // Create an authenticated Supabase client for the server-side request
     const cookieStore = await cookies()
     const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
@@ -21,18 +25,10 @@ export async function POST(request: NextRequest) {
           return cookieStore.get(name)?.value
         },
       },
+      global: {
+        headers: authHeader ? { Authorization: authHeader } : undefined
+      }
     })
-
-    // 1. Core Fix: Check for Authorization header first (Bearer Token)
-    const authHeader = request.headers.get('Authorization')
-    if (authHeader?.startsWith('Bearer ')) {
-      const token = authHeader.split(' ')[1]
-      console.log('📊 MONTHLY-PDF: Found Bearer token, setting session...')
-      await supabase.auth.setSession({
-        access_token: token,
-        refresh_token: '', // Not needed for single request
-      })
-    }
 
     // Verify authentication status for core diagnostics
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -66,6 +62,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ 
         error: 'No bills found for the selected period',
         auth: user ? 'authenticated' : 'anonymous',
+        authHeader: authHeader ? `${authHeader.substring(0, 15)}...` : 'missing',
         details: 'QueryResult: Empty set'
       }, { status: 404 })
     }
