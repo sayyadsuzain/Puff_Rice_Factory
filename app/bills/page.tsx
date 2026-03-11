@@ -85,13 +85,21 @@ export default function BillsPage() {
 
   const handlePrint = async (billId: number) => {
     try {
+      toast.loading('Opening PDF preview...', { id: 'print' })
       console.log('🎨 BILL-LIST: Generating PDF for bill ID:', billId)
-      // Open the Puppeteer-generated PDF inline in browser
-      const pdfUrl = `/api/bill-pdf?id=${billId}`
+
+      // Get current session for authentication
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token
+
+      // Construct URL with auth token for window.open
+      const pdfUrl = `/api/bill-pdf?id=${billId}${token ? `&token=${token}` : ''}`
+      
       window.open(pdfUrl, '_blank')
+      toast.success('PDF preview opened!', { id: 'print' })
     } catch (error) {
       console.error('❌ BILL-LIST: Error generating PDF:', error)
-      toast.error('Failed to generate PDF')
+      toast.error('Failed to generate PDF', { id: 'print' })
     }
   }
 
