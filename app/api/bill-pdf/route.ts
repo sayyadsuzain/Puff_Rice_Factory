@@ -8,7 +8,6 @@ import { supabaseUrl, supabaseAnonKey } from '@/lib/supabase'
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-
 function numberToWords(num: number): string {
   const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine']
   const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen']
@@ -51,11 +50,9 @@ export async function GET(request: NextRequest) {
   try {
     console.log('🎨 BILL-PDF: Starting PDF generation process...')
 
-    // 1. Core Fix: Check for Authorization header or 'token' query param
     const authHeader = request.headers.get('Authorization')
     const queryToken = searchParams.get('token')
     
-    // Construct the actual auth token to use
     let authToken = authHeader
     if (!authToken && queryToken) {
       authToken = `Bearer ${queryToken}`
@@ -63,7 +60,6 @@ export async function GET(request: NextRequest) {
     
     console.log('🎨 BILL-PDF: Auth method:', authHeader ? 'Header' : (queryToken ? 'Query' : 'None'))
 
-    // Create an authenticated Supabase client for the server-side request
     const cookieStore = await cookies()
     const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
       cookies: {
@@ -76,11 +72,9 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    // Verify authentication status for core diagnostics
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     console.log('🎨 BILL-PDF: Auth check:', user ? `Authenticated as ${user.email}` : 'Not authenticated', authError ? `Auth error: ${authError.message}` : '')
 
-    // Fetch bill FIRST without join (Core approach)
     const { data: bill, error: billError } = await supabase
       .from('bills')
       .select('*')
@@ -100,7 +94,6 @@ export async function GET(request: NextRequest) {
       }, { status: 404 })
     }
 
-    // Fetch party information separately (matches frontend logic)
     if (bill.party_id) {
       const { data: party, error: partyError } = await supabase
         .from('parties')
@@ -117,7 +110,6 @@ export async function GET(request: NextRequest) {
 
     console.log('✅ BILL-PDF: Bill fetched successfully:', bill.id)
 
-    // Fetch bill items
     const { data: items, error: itemsError } = await supabase
       .from('bill_items')
       .select('*')
@@ -131,16 +123,12 @@ export async function GET(request: NextRequest) {
 
     console.log('✅ BILL-PDF: Items fetched successfully:', items?.length || 0)
 
-    // Generate professional PDF using shared layout
-    const partyName = bill.parties?.name || 'Party Not Found'
-    const partyGst = bill.parties?.gst_number
-
     console.log('🎨 BILL-PDF: Generating HTML for bill...')
     const billHTML = generateBillHTML(
       bill,
       items || [],
-      1,   // pageNumber
-      1    // totalPages
+      1,
+      1
     )
 
     const fullHTML = `
@@ -156,27 +144,25 @@ export async function GET(request: NextRequest) {
             margin: 0;
           }
  
-          body {
+          html, body {
+            height: 100%;
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
             -webkit-print-color-adjust: exact;
-            color-adjust: exact;
-            background: #f3f4f6; /* Preview background */
+            box-sizing: border-box;
           }
  
           .a4-page {
             position: relative;
             width: 210mm;
-            min-height: 297mm;
+            height: 297mm;
             margin: 0 auto;
             background-color: white;
-            padding: 15mm;
+            padding: 8mm 12mm;
             box-sizing: border-box;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
-            font-family: Arial, sans-serif;
           }
  
           .watermark-ms {
@@ -187,10 +173,10 @@ export async function GET(request: NextRequest) {
             pointer-events: none;
             user-select: none;
             z-index: 0;
-            opacity: 0.06;
-            font-size: 320px;
+            opacity: 0.05;
+            font-size: 300px;
             font-weight: 900;
-            letter-spacing: 25px;
+            letter-spacing: 20px;
             font-family: "Playfair Display", serif;
             color: #c0c0c0;
           }
@@ -198,69 +184,65 @@ export async function GET(request: NextRequest) {
           .content-wrapper {
             position: relative;
             z-index: 10;
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-rows: auto auto auto 1fr auto;
             height: 100%;
-            flex: 1;
+            width: 100%;
+            gap: 0;
           }
  
-          /* Header */
           .header-top {
             width: 100%;
-            margin-bottom: 8px;
+            margin-bottom: 2px;
           }
           
           .jurisdiction {
             text-align: center;
-            font-size: 10px;
+            font-size: 8px;
             color: #6b7280;
             font-weight: bold;
             text-transform: uppercase;
-            letter-spacing: 0.025em;
-            margin-bottom: 4px;
+            margin-bottom: 1px;
           }
  
           .header-grid {
             display: grid;
             grid-template-columns: 1fr auto 1fr;
             align-items: start;
-            margin-bottom: 8px;
           }
  
           .memo-badge {
             display: inline-block;
             background-color: #dc2626;
             color: white;
-            padding: 4px 32px;
-            border-radius: 2px;
-            font-size: 11px;
+            padding: 2px 20px;
+            border-radius: 1px;
+            font-size: 9px;
             font-weight: 900;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.05em;
             text-transform: uppercase;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
           }
  
           .contact-info {
             text-align: right;
-            font-size: 10px;
+            font-size: 8px;
             font-weight: bold;
             color: #1f2937;
           }
  
           .company-name {
             text-align: center;
-            font-size: 48px;
+            font-size: 34px;
             font-weight: bold;
             color: #dc2626;
-            letter-spacing: -0.025em;
-            margin: 4px 0;
-            font-family: Arial, sans-serif;
+            letter-spacing: -0.02em;
+            margin: 0;
           }
  
           .company-address {
             text-align: center;
-            font-size: 10px;
-            letter-spacing: 0.1em;
+            font-size: 8.5px;
+            letter-spacing: 0.05em;
             color: #374151;
             font-weight: bold;
             text-transform: uppercase;
@@ -268,139 +250,142 @@ export async function GET(request: NextRequest) {
  
           .company-gst {
             text-align: center;
-            font-size: 11px;
+            font-size: 9px;
             font-weight: bold;
-            margin-top: 4px;
+            margin-top: 1px;
             color: #111827;
-            letter-spacing: 0.1em;
             text-transform: uppercase;
           }
  
           .red-divider-main {
-            border-bottom: 4px solid #dc2626;
-            margin-top: 8px;
+            border-bottom: 2.5px solid #dc2626;
+            margin-top: 4px;
           }
           .red-divider-sub {
-            border-bottom: 1px solid #dc2626;
-            margin-top: 2px;
+            border-bottom: 0.5px solid #dc2626;
+            margin-top: 1px;
           }
  
-          /* Bill Info */
           .bill-info-grid {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
-            gap: 16px;
-            font-size: 14px;
+            gap: 8px;
+            font-size: 11px;
             align-items: center;
-            padding: 8px 0;
-            margin-bottom: 16px;
+            padding: 4px 0;
           }
  
           .info-label {
             font-weight: bold;
-            font-size: 12px;
+            font-size: 10px;
             text-transform: uppercase;
             color: #6b7280;
           }
  
           .bill-no {
-            font-size: 20px;
+            font-size: 16px;
             font-weight: 900;
             color: #dc2626;
           }
  
           .party-details {
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            padding: 12px;
-            margin-bottom: 24px;
-            position: relative;
+            border: 0.5px solid #d1d5db;
+            border-radius: 4px;
+            padding: 6px 10px;
+            margin-bottom: 8px;
           }
  
           .party-name-row {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 500;
           }
  
           .party-name-underline {
-            border-bottom: 1px dotted #9ca3af;
-            min-width: 300px;
+            border-bottom: 0.5px dotted #9ca3af;
+            min-width: 250px;
             display: inline-block;
           }
  
           .vehicle-gst-row {
-            font-size: 14px;
-            margin-top: 8px;
+            font-size: 11px;
+            margin-top: 4px;
             display: flex;
             justify-content: space-between;
             font-weight: 600;
           }
  
-          /* Table */
           .items-table-container {
-            flex: 1;
-            min-height: 450px;
+            min-height: 0;
+            border-bottom: 0.5px solid #9ca3af;
           }
  
           .items-table {
             width: 100%;
-            font-size: 13px;
+            height: 100%;
+            font-size: 11px;
             border-collapse: collapse;
+            table-layout: fixed;
           }
  
           .items-table thead tr {
             background-color: #f9fafb;
-            border-top: 1px solid #9ca3af;
-            border-bottom: 1px solid #9ca3af;
+            border-top: 0.5px solid #9ca3af;
+            border-bottom: 0.5px solid #9ca3af;
+            height: 28px;
           }
  
           .items-table th {
-            border-left: 1px solid #9ca3af;
-            border-right: 1px solid #9ca3af;
-            padding: 8px;
+            border-left: 0.5px solid #9ca3af;
+            border-right: 0.5px solid #9ca3af;
+            padding: 2px 6px;
             text-align: left;
             font-weight: 900;
             text-transform: uppercase;
-            font-size: 12px;
-            letter-spacing: -0.025em;
+            font-size: 10px;
           }
  
           .items-table td {
-            border-left: 1px solid #e5e7eb;
-            border-right: 1px solid #e5e7eb;
-            padding: 6px 8px;
-            font-weight: 500;
+            border-left: 0.5px solid #9ca3af;
+            border-right: 0.5px solid #9ca3af;
+            padding: 3px 6px;
+            vertical-align: top;
           }
  
-          /* Footer */
+          .item-row {
+            height: 24px;
+            line-height: 24px;
+          }
+ 
+          .spacer-row {
+            height: 100%;
+          }
+ 
           .form-footer {
-            margin-top: 16px;
+            padding-top: 8px;
           }
  
           .footer-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 16px;
+            gap: 12px;
           }
  
           .words-section {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
+            font-size: 10px;
           }
  
           .totals-section {
             text-align: right;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 2px;
           }
  
           .total-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 14px;
+            font-size: 11px;
           }
  
           .total-label {
@@ -409,58 +394,56 @@ export async function GET(request: NextRequest) {
           }
  
           .grand-total-section {
-            border-top: 3px solid black;
-            padding-top: 8px;
-            margin-top: 8px;
+            border-top: 1.5px solid black;
+            padding-top: 4px;
+            margin-top: 2px;
           }
  
           .grand-total-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 4px;
           }
  
           .grand-total-label {
-            font-size: 20px;
+            font-size: 16px;
             font-weight: 900;
             font-style: italic;
           }
  
           .grand-total-value {
-            font-size: 24px;
+            font-size: 18px;
             font-weight: 900;
           }
  
           .signature-area {
-            padding-top: 24px;
+            padding-top: 12px;
             display: flex;
             justify-content: space-between;
             align-items: end;
-            padding-bottom: 8px;
           }
  
           .bank-info {
-            font-size: 11px;
+            font-size: 9px;
             text-align: left;
-            width: 50%;
+            width: 55%;
           }
  
           .bank-title {
             font-weight: bold;
             color: #dc2626;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
             text-transform: uppercase;
-            letter-spacing: -0.025em;
+            font-size: 8px;
           }
  
           .bank-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 2px;
+            gap: 0px;
             font-weight: bold;
             text-transform: uppercase;
-            font-size: 10px;
+            font-size: 8px;
             color: #1f2937;
           }
  
@@ -469,22 +452,21 @@ export async function GET(request: NextRequest) {
           }
  
           .signatory-title {
-            font-size: 11px;
+            font-size: 9px;
             font-weight: bold;
             color: #dc2626;
-            margin-bottom: 32px;
+            margin-bottom: 20px;
             text-transform: uppercase;
-            letter-spacing: -0.025em;
           }
  
           .signatory-line {
-            font-size: 10px;
+            font-size: 8px;
             font-weight: 500;
-            width: 176px;
+            width: 140px;
             margin-left: auto;
             text-align: center;
-            border-top: 1px solid #9ca3af;
-            padding-top: 4px;
+            border-top: 0.5px solid #9ca3af;
+            padding-top: 2px;
             color: #4b5563;
           }
         </style>
@@ -572,11 +554,10 @@ function generateBillHTML(bill: any, items: any[], _pageNumber: number, _totalPa
     year: 'numeric'
   })
 
-  // Table rows logic
   const itemRows = items.map((item) => {
     const isPaddyItem = item.particular?.toLowerCase().includes('paddy')
     return `
-      <tr class="h-8">
+      <tr class="item-row">
         <td>
           <div>${item.particular}</div>
           ${isPaddyItem && item.weight_kg ? `<div style="font-size: 10px; color: #2563eb; font-weight: bold;">(${item.weight_kg}kg total)</div>` : ''}
@@ -588,24 +569,12 @@ function generateBillHTML(bill: any, items: any[], _pageNumber: number, _totalPa
       </tr>
     `
   }).join('')
-
-  const emptyRowsNeeded = Math.max(0, 18 - items.length)
-  const emptyRows = Array.from({ length: emptyRowsNeeded }).map(() => `
-    <tr class="h-8">
-      <td style="color: transparent;">-</td>
-      <td style="color: transparent;">-</td>
-      <td style="color: transparent;">-</td>
-      <td style="color: transparent;">-</td>
-      <td style="color: transparent;">-</td>
-    </tr>
-  `).join('')
-
+ 
   return `
     <div class="a4-page">
       <div class="watermark-ms">MS</div>
       
       <div class="content-wrapper">
-        <!-- Header -->
         <div class="header-top">
           <div class="jurisdiction">${!isKacchi ? 'Subject to Sangli Jurisdiction' : ''}</div>
           <div class="header-grid">
@@ -628,7 +597,6 @@ function generateBillHTML(bill: any, items: any[], _pageNumber: number, _totalPa
           <div class="red-divider-sub"></div>
         </div>
 
-        <!-- Bill Info -->
         <div class="bill-info-grid">
           <div>
             <div class="info-label">From :</div>
@@ -644,7 +612,6 @@ function generateBillHTML(bill: any, items: any[], _pageNumber: number, _totalPa
           </div>
         </div>
 
-        <!-- Party -->
         <div class="party-details">
           <div class="party-name-row">
             <span style="font-weight: bold;">M/s. </span>
@@ -668,7 +635,6 @@ function generateBillHTML(bill: any, items: any[], _pageNumber: number, _totalPa
           ` : ''}
         </div>
 
-        <!-- Items -->
         <div class="items-table-container">
           <table class="items-table">
             <thead>
@@ -680,14 +646,19 @@ function generateBillHTML(bill: any, items: any[], _pageNumber: number, _totalPa
                 <th style="width: 128px; text-align: right;">Amount</th>
               </tr>
             </thead>
-            <tbody style="border-bottom: 1px solid #9ca3af;">
+            <tbody>
               ${itemRows}
-              ${emptyRows}
+              <tr class="spacer-row">
+                <td style="border-bottom: 1px solid #9ca3af;"></td>
+                <td style="border-bottom: 1px solid #9ca3af;"></td>
+                <td style="border-bottom: 1px solid #9ca3af;"></td>
+                <td style="border-bottom: 1px solid #9ca3af;"></td>
+                <td style="border-bottom: 1px solid #9ca3af;"></td>
+              </tr>
             </tbody>
           </table>
         </div>
 
-        <!-- Footer -->
         <div class="form-footer">
           <div class="footer-grid">
             <div class="words-section">
@@ -698,13 +669,13 @@ function generateBillHTML(bill: any, items: any[], _pageNumber: number, _totalPa
                 </div>
               </div>
             </div>
-
+ 
             <div class="totals-section">
               <div class="total-row">
                 <span class="total-label">SUB TOTAL</span>
                 <span style="font-weight: bold;">₹ ${(bill.total_amount || 0).toFixed(2)}</span>
               </div>
-
+ 
               ${!isKacchi && bill.is_gst_enabled && (bill.gst_total || 0) > 0 ? `
                 <div style="margin-top: 4px; border-top: 1px solid #f3f4f6; padding-top: 4px;">
                   ${(bill.cgst_percent || 0) > 0 ? `
@@ -725,14 +696,14 @@ function generateBillHTML(bill: any, items: any[], _pageNumber: number, _totalPa
                   </div>
                 </div>
               ` : ''}
-
+ 
               ${bill.balance > 0 ? `
                 <div class="total-row" style="margin-top: 4px;">
-                  <span class="total-label uppercase">BALANCE</span>
+                  <span class="total-label">BALANCE</span>
                   <span style="font-weight: bold; color: #ea580c;">₹ ${bill.balance.toFixed(2)}</span>
                 </div>
               ` : ''}
-
+ 
               <div class="grand-total-section">
                 <div class="grand-total-row">
                   <span class="grand-total-label">TOTAL</span>
@@ -741,8 +712,7 @@ function generateBillHTML(bill: any, items: any[], _pageNumber: number, _totalPa
               </div>
             </div>
           </div>
-
-          <!-- Signatory -->
+ 
           <div class="signature-area">
             <div class="bank-info">
               ${(!isKacchi && bill.bank_name) ? `

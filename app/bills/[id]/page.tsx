@@ -111,15 +111,11 @@ export default function BillDetailPage() {
 
 
   const handleEdit = () => {
-    console.log('🚀 EDIT BUTTON CLICKED - Starting redirect process')
-    console.log('Edit button clicked, billId:', billId, 'bill:', bill)
     if (!billId || isNaN(billId)) {
       toast.error('Invalid bill ID')
       return
     }
     const editUrl = `/bills/${billId}/edit`
-    console.log('Redirecting to:', editUrl)
-    console.log('🚀 REDIRECTING NOW...')
     window.location.href = editUrl
   }
 
@@ -142,7 +138,6 @@ export default function BillDetailPage() {
       if (error) throw error
 
       toast.success('Bill deleted successfully!')
-      // Redirect to bills list
       window.location.href = '/bills'
     } catch (error) {
       console.error('Error deleting bill:', error)
@@ -276,20 +271,28 @@ export default function BillDetailPage() {
                     <p className="text-base md:text-lg font-semibold break-all">{bill.vehicle_number}</p>
                   </div>
                 )}
-                <div>
-                  <p className="text-xs md:text-sm text-muted-foreground">Total Amount</p>
-                  <p className="text-xl md:text-2xl font-bold">₹{bill.total_amount.toFixed(2)}</p>
+                
+                <div className="pt-2 border-t border-gray-100">
+                  <div className="flex justify-between items-center mb-1">
+                    <p className="text-xs md:text-sm text-muted-foreground">Total Amount</p>
+                    <p className="text-base md:text-lg font-bold">₹{bill.total_amount.toFixed(2)}</p>
+                  </div>
+                  
                   {bill.balance !== null && bill.balance !== undefined && bill.balance > 0 && (
-                    <div className="mt-2 space-y-1">
+                    <div className="flex justify-between items-center mb-2">
                       <p className="text-xs md:text-sm text-muted-foreground">Balance</p>
-                      <p className="text-base md:text-lg font-bold">₹{bill.balance.toFixed(2)}</p>
-                      <div className="border-t border-gray-300 pt-2">
-                        <p className="text-xs md:text-sm text-muted-foreground">Grand Total</p>
-                        <p className="text-lg md:text-3xl font-bold text-green-600">₹{(bill.total_amount + bill.balance).toFixed(2)}</p>
-                      </div>
+                      <p className="text-base md:text-lg font-bold text-orange-600">₹{bill.balance.toFixed(2)}</p>
                     </div>
                   )}
+
+                  <div className="pt-2 border-t border-gray-300">
+                    <div className="flex justify-between items-center">
+                      <p className="text-sm md:text-base font-bold text-muted-foreground uppercase">Grand Total</p>
+                      <p className="text-xl md:text-3xl font-black text-green-600">₹{(bill.total_amount + (bill.balance || 0)).toFixed(2)}</p>
+                    </div>
+                  </div>
                 </div>
+
                 {bill.total_amount_words && (
                   <div>
                     <p className="text-xs md:text-sm text-muted-foreground">Amount in Words</p>
