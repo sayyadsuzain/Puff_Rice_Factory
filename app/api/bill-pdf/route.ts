@@ -173,7 +173,7 @@ export async function GET(request: NextRequest) {
             pointer-events: none;
             user-select: none;
             z-index: 0;
-            opacity: 0.05;
+            opacity: 0.12;
             font-size: 300px;
             font-weight: 900;
             letter-spacing: 20px;
