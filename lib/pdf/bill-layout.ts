@@ -22,8 +22,14 @@ export function generateBillHTML(
   const billNum = String(bill.bill_number)
   let formattedBillNo: string
   if (billNum.startsWith('P') || billNum.startsWith('K')) {
-    const numPart = billNum.substring(1)
-    formattedBillNo = billNum.charAt(0) + numPart.padStart(3, '0')
+    const parts = billNum.split('/')
+    if (parts.length > 1) {
+      const numPart = parts[parts.length - 1]
+      formattedBillNo = billNum.substring(0, billNum.length - numPart.length) + numPart.padStart(3, '0')
+    } else {
+      const numPart = billNum.substring(1)
+      formattedBillNo = billNum.charAt(0) + numPart.padStart(3, '0')
+    }
   } else {
     const prefix = isKacchi ? 'K' : 'P'
     formattedBillNo = `${prefix}${billNum.padStart(3, '0')}`
@@ -34,7 +40,7 @@ export function generateBillHTML(
     return `
       <tr class="item-row">
         <td>
-          <div>${item.particular}</div>
+          <div style="font-weight: 500;">${item.particular}</div>
           ${isPaddyItem && item.weight_kg ? `<div style="font-size: 10px; color: #2563eb; font-weight: bold;">(${item.weight_kg}kg total)</div>` : ''}
         </td>
         <td style="text-align: center;">${item.qty_bags || ''}</td>
@@ -58,7 +64,7 @@ export function generateBillHTML(
         <div class="watermark-ms">MS</div>
         
         <div class="content-wrapper">
-          <div class="header-top">
+          <header class="header-top">
             <div class="jurisdiction">${!isKacchi ? 'Subject to Sangli Jurisdiction' : ''}</div>
             <div class="header-grid">
               <div></div>
@@ -78,9 +84,9 @@ export function generateBillHTML(
             
             <div class="red-divider-main"></div>
             <div class="red-divider-sub"></div>
-          </div>
+          </header>
 
-          <div class="bill-info-grid">
+          <section class="bill-info-grid">
             <div>
               <div class="info-label">From :</div>
               <div style="font-weight: bold;">M S TRADING COMPANY</div>
@@ -93,9 +99,9 @@ export function generateBillHTML(
               <div class="info-label">Date :</div>
               <div style="font-weight: bold; font-size: 16px;">${billDateStr}</div>
             </div>
-          </div>
+          </section>
 
-          <div class="party-details">
+          <section class="party-details">
             <div class="party-name-row">
               <span style="font-weight: bold;">M/s. </span>
               <span class="party-name-underline">${partyName || '_'.repeat(40)}</span>
@@ -116,40 +122,38 @@ export function generateBillHTML(
                 ` : ''}
               </div>
             ` : ''}
-          </div>
+          </section>
 
-          <div class="items-table-container">
+          <main class="items-table-container">
             <table class="items-table">
               <thead>
                 <tr>
                   <th style="width: auto;">Particulars</th>
-                  <th style="width: 96px; text-align: center;">Qty. Bags</th>
-                  <th style="width: 112px; text-align: center;">Weight in Kg.</th>
-                  <th style="width: 96px; text-align: center;">Rate</th>
-                  <th style="width: 128px; text-align: right;">Amount</th>
+                  <th style="width: 80px; text-align: center;">Qty. Bags</th>
+                  <th style="width: 100px; text-align: center;">Weight in Kg.</th>
+                  <th style="width: 80px; text-align: center;">Rate</th>
+                  <th style="width: 120px; text-align: right;">Amount</th>
                 </tr>
               </thead>
               <tbody>
                 ${itemRows}
                 <tr class="spacer-row">
-                  <td style="border-bottom: none;"></td>
-                  <td style="border-bottom: none;"></td>
-                  <td style="border-bottom: none;"></td>
-                  <td style="border-bottom: none;"></td>
-                  <td style="border-bottom: none;"></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
                 </tr>
               </tbody>
             </table>
-          </div>
+          </main>
 
-          <div class="form-footer">
+          <footer class="form-footer">
             <div class="footer-grid">
               <div class="words-section">
-                <div>
-                  <div style="font-weight: bold; font-size: 10px; color: #6b7280; text-transform: uppercase; margin-bottom: 4px;">Rs. in Words:</div>
-                  <div style="font-size: 11px; font-weight: bold; line-height: 1.25; border-bottom: 1px solid #e5e7eb; padding-bottom: 8px;">
-                    ${totalInWords}
-                  </div>
+                <div style="font-weight: bold; font-size: 10px; color: #6b7280; text-transform: uppercase; margin-bottom: 4px;">Rs. in Words:</div>
+                <div style="font-size: 11px; font-weight: bold; line-height: 1.25; border-bottom: 1px solid #e5e7eb; padding-bottom: 8px;">
+                  ${totalInWords}
                 </div>
               </div>
     
@@ -167,7 +171,7 @@ export function generateBillHTML(
                         <span style="font-weight: bold; color: black;">₹ ${bill.cgst_amount.toFixed(2)}</span>
                       </div>
                     ` : ''}
-                     ${(bill.igst_percent || 0) > 0 ? `
+                    ${(bill.igst_percent || 0) > 0 ? `
                       <div class="total-row">
                         <span style="color: #4b5563;">IGST @ ${bill.igst_percent}%</span>
                         <span style="font-weight: bold; color: black;">₹ ${bill.igst_amount.toFixed(2)}</span>
@@ -202,8 +206,8 @@ export function generateBillHTML(
                   <div class="bank-title">BANK DETAILS:</div>
                   <div class="bank-grid">
                     <div style="display: flex; gap: 8px;"><span>BANK :</span> <span style="color: #000;">${bill.bank_name}</span></div>
-                    <div style="display: flex; gap: 8px;"><span>IFSC CODE NO. :</span> <span style="color: #000;">${bill.bank_ifsc}</span></div>
-                    <div style="display: flex; gap: 8px;"><span>S. B. No. :</span> <span style="color: #000;">${bill.bank_account}</span></div>
+                    <div style="display: flex; gap: 8px;"><span>IFSC CODE :</span> <span style="color: #000;">${bill.bank_ifsc}</span></div>
+                    <div style="display: flex; gap: 8px;"><span>ACCOUNT NO. :</span> <span style="color: #000;">${bill.bank_account}</span></div>
                   </div>
                 ` : ''}
               </div>
@@ -218,7 +222,7 @@ export function generateBillHTML(
                 Page ${pageNumber} of ${totalPages}
               </div>
             ` : ''}
-          </div>
+          </footer>
         </div>
       </div>
     </body>
