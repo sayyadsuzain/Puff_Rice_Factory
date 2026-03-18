@@ -40,7 +40,7 @@ export function generateBillHTML(
     return `
       <tr class="item-row">
         <td>
-          <div style="font-weight: 500;">${item.particular}</div>
+          <div>${item.particular}</div>
           ${isPaddyItem && item.weight_kg ? `<div style="font-size: 10px; color: #2563eb; font-weight: bold;">(${item.weight_kg}kg total)</div>` : ''}
         </td>
         <td style="text-align: center;">${item.qty_bags || ''}</td>
@@ -51,32 +51,16 @@ export function generateBillHTML(
     `
   }).join('')
 
-  // Fixed 18 rows total for visual consistency and parity with CA-look
-  const emptyRowsCount = Math.max(0, 18 - items.length)
-  const emptyRows = Array.from({ length: emptyRowsCount }).map(() => `
-    <tr class="item-row">
-      <td>-</td>
-      <td>-</td>
-      <td>-</td>
-      <td>-</td>
-      <td>-</td>
-    </tr>
-  `).join('')
-
   return `
     <!DOCTYPE html>
     <html>
     <head>
       <meta charset="UTF-8">
       <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;900&display=swap" rel="stylesheet">
-      <style>${BILL_CSS}
-        .item-row td:empty, .item-row td:contains("-") { color: transparent; user-select: none; }
-        .item-row td { color: inherit; }
-        tr.item-row td { color: transparent; } /* Hidden text for empty rows */
-        tr.item-row td > div, tr.item-row td:not(:empty) { color: black; }
-      </style>
+      <script src="https://cdn.tailwindcss.com"></script>
+      <style>${BILL_CSS}</style>
     </head>
-    <body>
+    <body class="bg-white">
       <div class="a4-page">
         <div class="watermark-ms">MS</div>
         
@@ -146,15 +130,21 @@ export function generateBillHTML(
               <thead>
                 <tr>
                   <th style="width: auto;">Particulars</th>
-                  <th style="width: 80px; text-align: center;">Qty. Bags</th>
-                  <th style="width: 100px; text-align: center;">Weight in Kg.</th>
-                  <th style="width: 80px; text-align: center;">Rate</th>
-                  <th style="width: 120px; text-align: right;">Amount</th>
+                  <th style="width: 96px; text-align: center;">Qty. Bags</th>
+                  <th style="width: 112px; text-align: center;">Weight in Kg.</th>
+                  <th style="width: 96px; text-align: center;">Rate</th>
+                  <th style="width: 128px; text-align: right;">Amount</th>
                 </tr>
               </thead>
               <tbody>
                 ${itemRows}
-                ${emptyRows}
+                <tr class="spacer-row">
+                  <td style="border-bottom: 0.5px solid #9ca3af;"></td>
+                  <td style="border-bottom: 0.5px solid #9ca3af;"></td>
+                  <td style="border-bottom: 0.5px solid #9ca3af;"></td>
+                  <td style="border-bottom: 0.5px solid #9ca3af;"></td>
+                  <td style="border-bottom: 0.5px solid #9ca3af;"></td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -162,9 +152,11 @@ export function generateBillHTML(
           <div class="form-footer">
             <div class="footer-grid">
               <div class="words-section">
-                <div style="font-weight: bold; font-size: 10px; color: #6b7280; text-transform: uppercase; margin-bottom: 4px;">Rs. in Words:</div>
-                <div style="font-size: 11px; font-weight: bold; line-height: 1.25; border-bottom: 1px solid #e5e7eb; padding-bottom: 8px;">
-                  ${totalInWords}
+                <div>
+                  <div style="font-weight: bold; font-size: 10px; color: #6b7280; text-transform: uppercase; margin-bottom: 4px;">Rs. in Words:</div>
+                  <div style="font-size: 11px; font-weight: bold; line-height: 1.25; border-bottom: 1px solid #e5e7eb; padding-bottom: 8px;">
+                    ${totalInWords}
+                  </div>
                 </div>
               </div>
     
@@ -229,7 +221,7 @@ export function generateBillHTML(
             </div>
 
             ${totalPages > 1 ? `
-              <div style="position: absolute; bottom: 5mm; left: 0; right: 0; text-align: center; font-size: 10px; color: #6b7280;">
+              <div class="page-number">
                 Page ${pageNumber} of ${totalPages}
               </div>
             ` : ''}

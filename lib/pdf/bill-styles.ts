@@ -11,7 +11,6 @@ export const BILL_CSS = `
     -webkit-print-color-adjust: exact;
     box-sizing: border-box;
     font-family: Arial, sans-serif;
-    background: white;
   }
 
   .a4-page {
@@ -25,6 +24,7 @@ export const BILL_CSS = `
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    page-break-after: always;
   }
 
   .watermark-ms {
@@ -47,7 +47,7 @@ export const BILL_CSS = `
     position: relative;
     z-index: 10;
     display: grid;
-    grid-template-rows: auto auto auto auto 1fr auto;
+    grid-template-rows: auto auto auto 1fr auto;
     height: 100%;
     width: 100%;
     gap: 0;
@@ -183,6 +183,7 @@ export const BILL_CSS = `
 
   .items-table {
     width: 100%;
+    height: 100%;
     font-size: 11px;
     border-collapse: collapse;
     table-layout: fixed;
@@ -217,9 +218,12 @@ export const BILL_CSS = `
     line-height: 24px;
   }
 
+  .spacer-row {
+    height: 100%;
+  }
+
   .form-footer {
     padding-top: 8px;
-    background: white;
   }
 
   .footer-grid {
@@ -326,5 +330,16 @@ export const BILL_CSS = `
     border-top: 0.5px solid #9ca3af;
     padding-top: 2px;
     color: #4b5563;
+  }
+
+  .page-number {
+    position: absolute;
+    bottom: 5mm;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 10px;
+    color: #6b7280;
+    z-index: 100;
   }
 `;
