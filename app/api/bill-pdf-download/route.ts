@@ -106,7 +106,9 @@ export async function GET(request: NextRequest) {
     `
 
     let browser
+    let step = 'init'
     try {
+      step = 'launching browser'
       browser = await puppeteer.launch({
         args: chromium.args,
         defaultViewport: chromium.defaultViewport,
@@ -115,9 +117,13 @@ export async function GET(request: NextRequest) {
         ignoreHTTPSErrors: true,
       })
 
+      step = 'new page'
       const page = await browser.newPage()
-      await page.setContent(fullHTML, { waitUntil: 'domcontentloaded' })
+      
+      step = 'setting content'
+      await page.setContent(fullHTML, { waitUntil: 'domcontentloaded', timeout: 30000 })
 
+      step = 'generating pdf'
       const pdf = await page.pdf({
         format: 'a4',
         printBackground: true,
@@ -136,12 +142,19 @@ export async function GET(request: NextRequest) {
           'Cache-Control': 'no-store, must-revalidate'
         }
       })
+    } catch (e: any) {
+      console.error(`❌ Puppeteer failed at step [${step}]:`, e)
+      return NextResponse.json({ 
+        error: 'Failed to generate PDF', 
+        details: e.message,
+        at: step
+      }, { status: 500 })
     } finally {
       if (browser) await browser.close()
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ bill-pdf-download error:', error)
-    return NextResponse.json({ error: 'Failed to generate PDF' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to generate PDF', details: error.message }, { status: 500 })
   }
 }
 
