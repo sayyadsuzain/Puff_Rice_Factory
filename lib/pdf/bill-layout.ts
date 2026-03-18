@@ -1,5 +1,5 @@
 import { BILL_CSS } from './bill-styles'
-import { numberToWords, formatDate } from '../supabase'
+import { numberToWords, formatDate, COMPANY_INFO } from '../supabase'
 
 export function generateBillHTML(
   bill: any,
@@ -8,10 +8,12 @@ export function generateBillHTML(
     partyName: string
     partyGst?: string
     isKacchi: boolean
+    pageNumber?: number
+    totalPages?: number
   }
 ): string {
-  const { partyName, partyGst, isKacchi } = options
-  const companyGst = '27CQIPS6685K1ZU'
+  const { partyName, partyGst, isKacchi, pageNumber = 1, totalPages = 1 } = options
+  const companyGst = COMPANY_INFO.gst
 
   const grandTotal = (bill.total_amount || 0) + (bill.gst_total || 0) + (bill.balance || 0)
   const totalInWords = numberToWords(grandTotal)
@@ -31,28 +33,17 @@ export function generateBillHTML(
     const isPaddyItem = item.particular?.toLowerCase().includes('paddy')
     return `
       <tr class="item-row">
-        <td style="border-left: 1px solid #9ca3af; border-right: 1px solid #e5e7eb;">
-          <div style="font-weight: 500;">${item.particular || ''}</div>
+        <td>
+          <div>${item.particular}</div>
           ${isPaddyItem && item.weight_kg ? `<div style="font-size: 10px; color: #2563eb; font-weight: bold;">(${item.weight_kg}kg total)</div>` : ''}
         </td>
-        <td style="border-right: 1px solid #e5e7eb; text-align: center;">${item.qty_bags || ''}</td>
-        <td style="border-right: 1px solid #e5e7eb; text-align: center;">${isPaddyItem ? `${item.weight_kg || ''}kg` : (item.weight_kg || '')}</td>
-        <td style="border-right: 1px solid #e5e7eb; text-align: center;">${item.rate ? item.rate.toFixed(2) : ''}</td>
-        <td style="border-right: 1px solid #9ca3af; text-align: right; font-weight: bold;">${item.amount?.toFixed(2) || ''}</td>
+        <td style="text-align: center;">${item.qty_bags || ''}</td>
+        <td style="text-align: center;">${isPaddyItem ? `${item.weight_kg || ''}kg` : (item.weight_kg || '')}</td>
+        <td style="text-align: center;">${item.rate ? `${item.rate.toFixed(2)}${isPaddyItem ? ' ₹/kg' : ''}` : ''}</td>
+        <td style="text-align: right; font-weight: bold;">${item.amount?.toFixed(2) || ''}</td>
       </tr>
     `
   }).join('')
-
-  const emptyRowsCount = Math.max(0, 18 - items.length)
-  const emptyRows = Array.from({ length: emptyRowsCount }).map(() => `
-    <tr style="height: 32px;">
-      <td style="border-left: 1px solid #9ca3af; border-right: 1px solid #f3f4f6; color: transparent;">-</td>
-      <td style="border-right: 1px solid #f3f4f6; color: transparent;">-</td>
-      <td style="border-right: 1px solid #f3f4f6; color: transparent;">-</td>
-      <td style="border-right: 1px solid #f3f4f6; color: transparent;">-</td>
-      <td style="border-right: 1px solid #9ca3af; color: transparent;">-</td>
-    </tr>
-  `).join('')
 
   return `
     <!DOCTYPE html>
@@ -65,6 +56,7 @@ export function generateBillHTML(
     <body>
       <div class="a4-page">
         <div class="watermark-ms">MS</div>
+        
         <div class="content-wrapper">
           <div class="header-top">
             <div class="jurisdiction">${!isKacchi ? 'Subject to Sangli Jurisdiction' : ''}</div>
@@ -79,9 +71,11 @@ export function generateBillHTML(
                 <div>9561420666</div>
               </div>
             </div>
+            
             <h1 class="company-name">M S TRADING COMPANY</h1>
             <div class="company-address">KUPWAD MIDC NEAR NAV KRISHNA VALLEY, PLOT NO L-52</div>
             ${!isKacchi ? `<div class="company-gst">GST IN : ${companyGst}</div>` : ''}
+            
             <div class="red-divider-main"></div>
             <div class="red-divider-sub"></div>
           </div>
@@ -89,7 +83,7 @@ export function generateBillHTML(
           <div class="bill-info-grid">
             <div>
               <div class="info-label">From :</div>
-              <div style="font-weight: bold; font-size: 14px;">M S TRADING COMPANY</div>
+              <div style="font-weight: bold;">M S TRADING COMPANY</div>
             </div>
             <div style="text-align: center;">
               <div class="info-label">No.</div>
@@ -104,12 +98,24 @@ export function generateBillHTML(
           <div class="party-details">
             <div class="party-name-row">
               <span style="font-weight: bold;">M/s. </span>
-              <span class="party-name-underline">${partyName}</span>
+              <span class="party-name-underline">${partyName || '_'.repeat(40)}</span>
             </div>
-            <div class="vehicle-gst-row">
-              ${bill.vehicle_number ? `<div><span style="color: #4b5563;">Vehicle No.: </span><span>${bill.vehicle_number}</span></div>` : '<div></div>'}
-              ${!isKacchi && partyGst ? `<div><span style="color: #4b5563;">GST No.: </span><span>${partyGst}</span></div>` : ''}
-            </div>
+            ${(bill.vehicle_number || (!isKacchi && partyGst)) ? `
+              <div class="vehicle-gst-row">
+                ${bill.vehicle_number ? `
+                  <div>
+                    <span style="color: #4b5563;">Vehicle No.: </span>
+                    <span>${bill.vehicle_number}</span>
+                  </div>
+                ` : '<div></div>'}
+                ${!isKacchi && partyGst ? `
+                  <div>
+                    <span style="color: #4b5563;">GST No.: </span>
+                    <span>${partyGst}</span>
+                  </div>
+                ` : ''}
+              </div>
+            ` : ''}
           </div>
 
           <div class="items-table-container">
@@ -117,68 +123,101 @@ export function generateBillHTML(
               <thead>
                 <tr>
                   <th style="width: auto;">Particulars</th>
-                  <th style="width: 80px; text-align: center;">Qty. Bags</th>
-                  <th style="width: 100px; text-align: center;">Weight in Kg.</th>
-                  <th style="width: 80px; text-align: center;">Rate</th>
-                  <th style="width: 120px; text-align: right;">Amount</th>
+                  <th style="width: 96px; text-align: center;">Qty. Bags</th>
+                  <th style="width: 112px; text-align: center;">Weight in Kg.</th>
+                  <th style="width: 96px; text-align: center;">Rate</th>
+                  <th style="width: 128px; text-align: right;">Amount</th>
                 </tr>
               </thead>
-              <tbody style="border-bottom: 1px solid #9ca3af;">
+              <tbody>
                 ${itemRows}
-                ${emptyRows}
+                <tr class="spacer-row">
+                  <td style="border-bottom: none;"></td>
+                  <td style="border-bottom: none;"></td>
+                  <td style="border-bottom: none;"></td>
+                  <td style="border-bottom: none;"></td>
+                  <td style="border-bottom: none;"></td>
+                </tr>
               </tbody>
             </table>
           </div>
 
           <div class="form-footer">
             <div class="footer-grid">
-              <div>
-                <div style="font-weight: bold; font-size: 10px; color: #6b7280; text-transform: uppercase; margin-bottom: 4px;">Rs. in Words:</div>
-                <div style="font-size: 11px; font-weight: bold; line-height: 1.25; border-bottom: 1px solid #e5e7eb; padding-bottom: 8px;">
-                  ${totalInWords}
+              <div class="words-section">
+                <div>
+                  <div style="font-weight: bold; font-size: 10px; color: #6b7280; text-transform: uppercase; margin-bottom: 4px;">Rs. in Words:</div>
+                  <div style="font-size: 11px; font-weight: bold; line-height: 1.25; border-bottom: 1px solid #e5e7eb; padding-bottom: 8px;">
+                    ${totalInWords}
+                  </div>
                 </div>
               </div>
-              <div style="text-align: right;">
-                <div style="display: flex; justify-content: space-between; font-size: 14px;">
-                  <span style="font-weight: bold; color: #4b5563;">SUB TOTAL</span>
+    
+              <div class="totals-section">
+                <div class="total-row">
+                  <span class="total-label">SUB TOTAL</span>
                   <span style="font-weight: bold;">₹ ${(bill.total_amount || 0).toFixed(2)}</span>
                 </div>
-                ${!isKacchi && (bill.is_gst_enabled || (bill.gst_total || 0) > 0) ? `
-                  <div style="margin-top: 4px; border-top: 1px solid #f3f4f6; padding-top: 4px;">
-                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: #4b5563;">
-                      <span>GST TOTAL</span><span style="font-weight: bold; color: black;">₹ ${(bill.gst_total || 0).toFixed(2)}</span>
+    
+                ${!isKacchi && bill.is_gst_enabled && (bill.gst_total || 0) > 0 ? `
+                  <div style="margin-top: 4px; border-top: 0.5px solid #f3f4f6; padding-top: 4px;">
+                    ${(bill.cgst_percent || 0) > 0 ? `
+                      <div class="total-row">
+                        <span style="color: #4b5563;">CGST @ ${bill.cgst_percent}%</span>
+                        <span style="font-weight: bold; color: black;">₹ ${bill.cgst_amount.toFixed(2)}</span>
+                      </div>
+                    ` : ''}
+                     ${(bill.igst_percent || 0) > 0 ? `
+                      <div class="total-row">
+                        <span style="color: #4b5563;">IGST @ ${bill.igst_percent}%</span>
+                        <span style="font-weight: bold; color: black;">₹ ${bill.igst_amount.toFixed(2)}</span>
+                      </div>
+                    ` : ''}
+                    <div class="total-row" style="font-weight: bold; padding-top: 4px; border-top: 0.5px solid #f3f4f6; margin-top: 2px;">
+                      <span style="color: #4b5563;">GST Total:</span>
+                      <span>₹ ${bill.gst_total.toFixed(2)}</span>
                     </div>
                   </div>
                 ` : ''}
+    
                 ${bill.balance > 0 ? `
-                  <div style="display: flex; justify-content: space-between; font-size: 14px; margin-top: 4px;">
+                  <div class="total-row" style="margin-top: 4px;">
                     <span style="font-weight: bold; color: #4b5563; text-transform: uppercase;">BALANCE</span>
                     <span style="font-weight: bold; color: #ea580c;">₹ ${bill.balance.toFixed(2)}</span>
                   </div>
                 ` : ''}
+    
                 <div class="grand-total-section">
-                  <span class="grand-total-label">TOTAL</span>
-                  <span class="grand-total-value">₹ ${grandTotal.toFixed(2)}</span>
+                  <div class="grand-total-row">
+                    <span class="grand-total-label">TOTAL</span>
+                    <span class="grand-total-value">₹ ${grandTotal.toFixed(2)}</span>
+                  </div>
                 </div>
               </div>
             </div>
-
+  
             <div class="signature-area">
               <div class="bank-info">
                 ${(!isKacchi && bill.bank_name) ? `
                   <div class="bank-title">BANK DETAILS:</div>
                   <div class="bank-grid">
                     <div style="display: flex; gap: 8px;"><span>BANK :</span> <span style="color: #000;">${bill.bank_name}</span></div>
-                    <div style="display: flex; gap: 8px;"><span>IFSC CODE :</span> <span style="color: #000;">${bill.bank_ifsc}</span></div>
-                    <div style="display: flex; gap: 8px;"><span>ACCOUNT NO. :</span> <span style="color: #000;">${bill.bank_account}</span></div>
+                    <div style="display: flex; gap: 8px;"><span>IFSC CODE NO. :</span> <span style="color: #000;">${bill.bank_ifsc}</span></div>
+                    <div style="display: flex; gap: 8px;"><span>S. B. No. :</span> <span style="color: #000;">${bill.bank_account}</span></div>
                   </div>
                 ` : ''}
               </div>
-              <div style="text-align: right;">
+              <div class="signatory-box">
                 <div class="signatory-title">For M S TRADING COMPANY</div>
                 <div class="signatory-line">Auth. Signatory</div>
               </div>
             </div>
+
+            ${totalPages > 1 ? `
+              <div style="position: absolute; bottom: 5mm; left: 0; right: 0; text-align: center; font-size: 10px; color: #6b7280;">
+                Page ${pageNumber} of ${totalPages}
+              </div>
+            ` : ''}
           </div>
         </div>
       </div>

@@ -25,6 +25,7 @@ export const BILL_CSS = `
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    page-break-after: always;
   }
 
   .watermark-ms {
@@ -95,17 +96,17 @@ export const BILL_CSS = `
 
   .company-name {
     text-align: center;
-    font-size: 44px; /* Slightly adjusted to match 34px-48px range */
+    font-size: 34px;
     font-weight: bold;
     color: #dc2626;
-    letter-spacing: -1px;
-    margin: 2px 0;
+    letter-spacing: -0.02em;
+    margin: 0;
   }
 
   .company-address {
     text-align: center;
-    font-size: 9px;
-    letter-spacing: 1px;
+    font-size: 8.5px;
+    letter-spacing: 0.05em;
     color: #374151;
     font-weight: bold;
     text-transform: uppercase;
@@ -113,7 +114,7 @@ export const BILL_CSS = `
 
   .company-gst {
     text-align: center;
-    font-size: 10px;
+    font-size: 9px;
     font-weight: bold;
     margin-top: 1px;
     color: #111827;
@@ -121,12 +122,12 @@ export const BILL_CSS = `
   }
 
   .red-divider-main {
-    border-bottom: 4px solid #dc2626;
-    margin-top: 6px;
+    border-bottom: 2.5px solid #dc2626;
+    margin-top: 4px;
   }
   .red-divider-sub {
-    border-bottom: 1px solid #dc2626;
-    margin-top: 2px;
+    border-bottom: 0.5px solid #dc2626;
+    margin-top: 1px;
   }
 
   .bill-info-grid {
@@ -135,7 +136,7 @@ export const BILL_CSS = `
     gap: 8px;
     font-size: 11px;
     align-items: center;
-    padding: 6px 0;
+    padding: 4px 0;
   }
 
   .info-label {
@@ -146,144 +147,191 @@ export const BILL_CSS = `
   }
 
   .bill-no {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 900;
     color: #dc2626;
   }
 
   .party-details {
-    border: 1px solid #d1d5db;
+    border: 0.5px solid #d1d5db;
     border-radius: 4px;
-    padding: 8px 12px;
+    padding: 6px 10px;
     margin-bottom: 8px;
   }
 
   .party-name-row {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 500;
   }
 
   .party-name-underline {
-    border-bottom: 1px dotted #9ca3af;
-    min-width: 300px;
+    border-bottom: 0.5px dotted #9ca3af;
+    min-width: 250px;
     display: inline-block;
   }
 
   .vehicle-gst-row {
-    font-size: 12px;
-    margin-top: 6px;
+    font-size: 11px;
+    margin-top: 4px;
     display: flex;
     justify-content: space-between;
     font-weight: 600;
   }
 
   .items-table-container {
-    flex: 1;
-    min-height: 450px;
+    min-height: 0;
+    border-bottom: 0.5px solid #9ca3af;
   }
 
   .items-table {
     width: 100%;
-    font-size: 13px;
+    height: 100%;
+    font-size: 11px;
     border-collapse: collapse;
     table-layout: fixed;
   }
 
   .items-table thead tr {
     background-color: #f9fafb;
-    border-top: 1px solid #9ca3af;
-    border-bottom: 1px solid #9ca3af;
+    border-top: 0.5px solid #9ca3af;
+    border-bottom: 0.5px solid #9ca3af;
+    height: 28px;
   }
 
   .items-table th {
-    border-left: 1px solid #9ca3af;
-    border-right: 1px solid #9ca3af;
-    padding: 6px 8px;
+    border-left: 0.5px solid #9ca3af;
+    border-right: 0.5px solid #9ca3af;
+    padding: 2px 6px;
     text-align: left;
     font-weight: 900;
     text-transform: uppercase;
-    font-size: 11px;
+    font-size: 10px;
   }
 
   .items-table td {
-    padding: 6px 8px;
-    vertical-align: middle;
+    border-left: 0.5px solid #9ca3af;
+    border-right: 0.5px solid #9ca3af;
+    padding: 3px 6px;
+    vertical-align: top;
   }
 
   .item-row {
-    height: 32px;
+    height: 24px;
+    line-height: 24px;
+  }
+
+  .spacer-row {
+    height: 100%;
+  }
+
+  .form-footer {
+    padding-top: 8px;
   }
 
   .footer-grid {
     display: grid;
-    grid-template-columns: 1.2fr 1fr;
-    gap: 20px;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .words-section {
+    font-size: 10px;
+    text-align: left;
+  }
+
+  .totals-section {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+  }
+
+  .total-label {
+    font-weight: bold;
+    color: #4b5563;
   }
 
   .grand-total-section {
-    border-top: 3px solid black;
-    padding-top: 6px;
-    margin-top: 4px;
+    border-top: 1.5px solid black;
+    padding-top: 4px;
+    margin-top: 2px;
+  }
+
+  .grand-total-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
 
   .grand-total-label {
-    font-size: 20px;
+    font-size: 16px;
     font-weight: 900;
     font-style: italic;
   }
 
   .grand-total-value {
-    font-size: 24px;
+    font-size: 18px;
     font-weight: 900;
   }
 
   .signature-area {
-    margin-top: 24px;
+    padding-top: 12px;
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
-    padding-bottom: 8px;
+    align-items: end;
   }
 
   .bank-info {
+    font-size: 9px;
     text-align: left;
-    width: 50%;
+    width: 55%;
   }
 
   .bank-title {
-    font-size: 11px;
     font-weight: bold;
     color: #dc2626;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
     text-transform: uppercase;
+    font-size: 8px;
   }
 
   .bank-grid {
-    font-size: 10px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0px;
     font-weight: bold;
-    color: #1f2937;
     text-transform: uppercase;
+    font-size: 8px;
+    color: #1f2937;
+  }
+
+  .signatory-box {
+    text-align: right;
   }
 
   .signatory-title {
-    font-size: 11px;
+    font-size: 9px;
     font-weight: bold;
     color: #dc2626;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     text-transform: uppercase;
   }
 
   .signatory-line {
-    font-size: 10px;
+    font-size: 8px;
     font-weight: 500;
-    width: 160px;
+    width: 140px;
     margin-left: auto;
     text-align: center;
-    border-top: 1px solid #9ca3af;
-    padding-top: 4px;
+    border-top: 0.5px solid #9ca3af;
+    padding-top: 2px;
     color: #4b5563;
   }
 `;
