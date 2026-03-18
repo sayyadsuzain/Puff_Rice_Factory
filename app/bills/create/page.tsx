@@ -765,8 +765,8 @@ export default function CreateBillPage() {
             </Card>
           </div>
 
-          {/* Preview Section — hidden on small screens */}
-          <div className="hidden xl:flex xl:flex-col xl:h-full xl:overflow-hidden bg-white/50 rounded-2xl border border-gray-200">
+          {/* Preview Section */}
+          <div className="flex flex-col h-full bg-white/50 rounded-2xl border border-gray-200 overflow-hidden min-h-[500px] xl:min-h-0">
             <div className="p-3 border-b bg-gray-50 text-[10px] font-black text-gray-400 uppercase tracking-widest flex justify-between items-center">
               <span>Live PDF Preview Engine</span>
               <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-md font-black italic">A4 Scaled v2.0</span>
@@ -777,18 +777,14 @@ export default function CreateBillPage() {
                 billNumber={nextBillNumber || ''}
                 billDate={billDate}
                 partyName={partyName}
-                partyGst={isGstEnabled ? partyGst : undefined}
+                partyGst={partyGst}
                 vehicleNumber={vehicleNumber}
-                balance={balance && parseFloat(balance) > 0 ? parseFloat(balance) : undefined}
-                bankName={billType === 'pakki' ? bankName : undefined}
-                bankIFSC={billType === 'pakki' ? bankIFSC : undefined}
-                bankAccount={billType === 'pakki' ? bankAccount : undefined}
-                showBankDetails={showBankDetails}
+                balance={balance ? parseFloat(balance) : undefined}
                 items={items}
                 itemsTotal={itemsTotal}
                 gstEnabled={isGstEnabled}
-                cgstPercent={isGstEnabled ? cgstPercent : 0}
-                igstPercent={isGstEnabled ? igstPercent : 0}
+                cgstPercent={cgstPercent}
+                igstPercent={igstPercent}
                 gstTotal={gstTotal}
                 grandTotal={grandTotal}
                 totalAmountWords={totalAmountWords}

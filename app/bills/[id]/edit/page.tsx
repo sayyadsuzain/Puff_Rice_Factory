@@ -665,96 +665,101 @@ export default function EditBillPage() {
                   </div>
                 )}
 
-                {/* STEP 6: FINAL REVIEW & SAVE */}
-                <div className="space-y-4 p-4 bg-gray-50 rounded-lg border-l-4 border-gray-500">
-                  <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                    <span className="bg-gray-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">6</span>
-                    Final Review
-                  </h3>
+                      {/* FINAL STEP: GRAND REVIEW */}
+                      <div className="space-y-5 p-4 sm:p-6 bg-slate-900 text-white rounded-2xl shadow-xl border-4 border-slate-800">
+                        <h3 className="text-xl font-black flex items-center gap-3">
+                          <span className="bg-green-500 text-slate-900 rounded-lg w-8 h-8 flex items-center justify-center text-base font-black italic">✓</span>
+                          Final Review
+                        </h3>
 
-                  {/* Totals Summary */}
-                  <div className="bg-white p-4 rounded-lg border space-y-3">
-                    <Label className="text-sm md:text-base font-semibold">Bill Summary</Label>
+                        <div className="space-y-4 pt-2">
+                           <div className="flex justify-between items-center text-slate-400 text-sm">
+                              <span className="font-bold">Items Total:</span>
+                              <span className="font-mono">₹{totalAmount.toFixed(2)}</span>
+                           </div>
+                           
+                           {billType === 'pakki' && gstTotal > 0 && (
+                             <div className="flex justify-between items-center text-blue-400 text-sm">
+                                <span className="font-bold">GST (Applied):</span>
+                                <span className="font-mono">₹{gstTotal.toFixed(2)}</span>
+                             </div>
+                           )}
 
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span>Items Total:</span>
-                        <span className="font-medium">₹{totalAmount.toFixed(2)}</span>
-                      </div>
+                           {parseFloat(balance || '0') !== 0 && (
+                             <div className="flex justify-between items-center text-amber-400 text-sm">
+                                <span className="font-bold">Old Balance:</span>
+                                <span className="font-mono">₹{parseFloat(balance).toFixed(2)}</span>
+                             </div>
+                           )}
 
-                      {billType === 'pakki' && isGstEnabled && (
-                        <div className="flex justify-between">
-                          <span>GST Total:</span>
-                          <span className="font-medium text-indigo-600">₹{gstTotal.toFixed(2)}</span>
+                           <div className="pt-4 border-t border-slate-700">
+                              <div className="mb-4">
+                                 <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">In Words:</p>
+                                 <textarea
+                                   value={totalAmountWords}
+                                   onChange={(e) => setTotalAmountWords(e.target.value)}
+                                   className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-xs text-slate-200 font-medium italic resize-none h-20 focus:outline-none focus:ring-2 focus:ring-green-500/50"
+                                   placeholder="Amount in words..."
+                                 />
+                              </div>
+                              <div className="text-right">
+                                 <p className="text-[10px] text-green-500 font-black uppercase tracking-widest mb-1">Invoice Total</p>
+                                 <p className="text-3xl sm:text-4xl font-black text-green-400">₹{grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
+                              </div>
+                           </div>
                         </div>
-                      )}
 
-                      {balance && parseFloat(balance) !== 0 && (
-                        <div className="flex justify-between">
-                          <span>Balance:</span>
-                          <span className="font-medium text-orange-600">₹{parseFloat(balance).toFixed(2)}</span>
+                        <div className="pt-4 flex flex-col sm:flex-row items-center gap-4">
+                          <Button
+                            onClick={handleSaveBill}
+                            disabled={loading}
+                            className="w-full sm:flex-1 h-14 text-lg font-black bg-green-500 hover:bg-green-400 text-slate-900 shadow-[0_0_20px_rgba(34,197,94,0.3)] transition-all hover:scale-[1.02] active:scale-95"
+                          >
+                            {loading ? 'Synchronizing...' : 'UPDATE BILL NOW'}
+                          </Button>
+                          <Link href={`/bills/${billId}`} className="w-full sm:w-auto">
+                            <Button type="button" variant="ghost" className="w-full h-14 text-slate-500 hover:text-white font-bold uppercase tracking-tighter text-xs">
+                              Discard
+                            </Button>
+                          </Link>
                         </div>
-                      )}
-
-                      <div className="border-t pt-2 flex justify-between text-base font-bold">
-                        <span>Grand Total:</span>
-                        <span className="text-green-600">₹{grandTotal.toFixed(2)}</span>
                       </div>
-                    </div>
+                    </CardContent>
+                  </Card>
+                </div>
 
-                    <div className="space-y-2 pt-2 border-t">
-                      <Label className="text-sm md:text-base font-medium">Amount in Words</Label>
-                      <Input
-                        placeholder="e.g., Sixty-Five Thousand Only"
-                        value={totalAmountWords}
-                        onChange={(e) => setTotalAmountWords(e.target.value)}
-                        className="text-sm md:text-base"
-                        disabled={loading}
-                      />
-                    </div>
+                {/* Preview Section */}
+                <div className="flex flex-col h-full bg-white/50 rounded-2xl border border-gray-200 overflow-hidden min-h-[500px] xl:min-h-0">
+                  <div className="p-3 border-b bg-gray-50 text-[10px] font-black text-gray-400 uppercase tracking-widest flex justify-between items-center">
+                    <span>Live PDF Preview Engine</span>
+                    <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-md font-black italic">A4 Scaled v2.0</span>
+                  </div>
+                  <div className="flex-1 overflow-hidden">
+                    <BillPreview
+                      billType={billType}
+                      billNumber={billNumber ? `${billType === 'kacchi' ? 'K' : 'P'}${String(billNumber).padStart(3, '0')}` : ''}
+                      billDate={billDate}
+                      partyName={partyName}
+                      partyGst={isGstEnabled ? partyGst : undefined}
+                      vehicleNumber={vehicleNumber}
+                      balance={balance && parseFloat(balance) > 0 ? parseFloat(balance) : undefined}
+                      bankName={billType === 'pakki' ? bankName : undefined}
+                      bankIFSC={billType === 'pakki' ? bankIFSC : undefined}
+                      bankAccount={billType === 'pakki' ? bankAccount : undefined}
+                      showBankDetails={showBankDetails}
+                      items={items}
+                      itemsTotal={totalAmount}
+                      gstEnabled={isGstEnabled}
+                      cgstPercent={isGstEnabled ? cgstPercent : 0}
+                      igstPercent={isGstEnabled ? igstPercent : 0}
+                      gstTotal={gstTotal}
+                      grandTotal={grandTotal}
+                      totalAmountWords={totalAmountWords}
+                    />
                   </div>
                 </div>
-
-                {/* UPDATE BILL BUTTON */}
-                <div className="pt-4 border-t">
-                  <Button
-                    onClick={handleSaveBill}
-                    disabled={loading}
-                    className="w-full text-base font-semibold py-3"
-                  >
-                    {loading ? 'Updating Bill...' : 'Update Bill'}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Preview Section */}
-          <div className="mt-6 md:mt-0">
-            <BillPreview
-              billType={billType}
-              billNumber={`${billType === 'kacchi' ? 'K' : 'P'}${String(billNumber || 0).padStart(3, '0')}`}
-              billDate={billDate}
-              partyName={partyName}
-              partyGst={isGstEnabled ? partyGst : undefined}
-              vehicleNumber={vehicleNumber}
-              balance={balance && parseFloat(balance) > 0 ? parseFloat(balance) : undefined}
-              bankName={billType === 'pakki' ? bankName : undefined}
-              bankIFSC={billType === 'pakki' ? bankIFSC : undefined}
-              bankAccount={billType === 'pakki' ? bankAccount : undefined}
-              showBankDetails={showBankDetails}
-              items={items}
-              itemsTotal={totalAmount}
-              gstEnabled={isGstEnabled}
-              cgstPercent={isGstEnabled ? cgstPercent : 0}
-              igstPercent={isGstEnabled ? igstPercent : 0}
-              gstTotal={gstTotal}
-              grandTotal={grandTotal}
-              totalAmountWords={totalAmountWords}
-            />
-          </div>
-        </div>
-      </div>
-    </ProtectedRoute>
-  )
-}
+              </div>
+            </div>
+          </ProtectedRoute>
+        )
+      }
