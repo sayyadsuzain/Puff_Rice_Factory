@@ -358,10 +358,9 @@ export default function CreateBillPage() {
         .insert([billData])
         .select()
 
-      if (billError) {
-        console.error('Bill insert error:', billError)
-        console.error('Bill data being inserted:', billData)
-        throw billError
+      if (!billResult || billResult.length === 0) {
+        console.error('❌ ERROR: Bill insert succeeded but no result returned!')
+        throw new Error('No bill data returned after insert')
       }
 
       billId = billResult[0].id
@@ -403,11 +402,9 @@ export default function CreateBillPage() {
         return
       }
 
-      // Add a small delay to show the success message before redirect
-      setTimeout(() => {
-        console.log('🔄 REDIRECTING NOW to:', `/bills/${billId}`)
-        router.push(`/bills/${billId}`)
-      }, 1500)
+      // Redirect to view page
+      router.refresh()
+      router.push(`/bills/${billId}`)
     } catch (error) {
       console.error('Error creating bill:', error)
       toast.error('Failed to create bill')
@@ -753,11 +750,6 @@ export default function CreateBillPage() {
                       >
                         {loading ? 'Sychronizing...' : 'GENERATE BILL NOW'}
                       </Button>
-                      <Link href="/bills" className="w-full sm:w-auto">
-                        <Button type="button" variant="ghost" className="w-full h-14 text-slate-500 hover:text-white font-bold uppercase tracking-tighter text-xs">
-                          Discard
-                        </Button>
-                      </Link>
                     </div>
                   </div>
                 </form>
