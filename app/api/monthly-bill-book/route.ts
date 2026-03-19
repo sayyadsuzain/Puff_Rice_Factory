@@ -600,7 +600,8 @@ export async function POST(request: NextRequest) {
       return new NextResponse(pdf as any, {
         headers: {
           'Content-Type': 'application/pdf',
-          'Content-Disposition': `attachment; filename=${filename}`
+          'Content-Disposition': `attachment; filename=${filename}`,
+          'Link': '</favicon.ico?v=4>; rel="icon"'
         }
       })
     } finally {
