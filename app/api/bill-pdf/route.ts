@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
         headers: {
           'Content-Type': 'application/pdf',
           'Content-Disposition': `inline; filename="${filename}"`,
-          'Link': '</favicon.ico?v=4>; rel="icon"'
+          'Link': '</favicon.ico?v=5>; rel="icon"'
         }
       })
     } finally {
