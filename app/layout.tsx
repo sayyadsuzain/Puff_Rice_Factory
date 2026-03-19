@@ -15,26 +15,26 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: '/icon.svg?v=15',
+        url: '/icon.svg?v=16',
         type: 'image/svg+xml',
       },
       {
-        url: '/icon-light-32x32.png?v=15',
+        url: '/icon-light-32x32.png?v=16',
         media: '(prefers-color-scheme: light)',
       },
       {
-        url: '/icon-dark-32x32.png?v=15',
+        url: '/icon-dark-32x32.png?v=16',
         media: '(prefers-color-scheme: dark)',
       },
       {
-        url: '/icon.png?v=15',
+        url: '/icon.png?v=16',
         type: 'image/png',
       },
       {
-        url: '/favicon.ico?v=15',
+        url: '/favicon.ico?v=16',
       },
     ],
-    apple: '/apple-icon.png?v=15',
+    apple: '/apple-icon.png?v=16',
   },
 }
 

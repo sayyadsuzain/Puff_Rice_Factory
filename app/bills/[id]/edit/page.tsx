@@ -55,6 +55,8 @@ export default function EditBillPage() {
   const [partyGst, setPartyGst] = useState('')
   const [originalPartyGst, setOriginalPartyGst] = useState('')
   const [shouldUpdatePartyGst, setShouldUpdatePartyGst] = useState(false)
+  const [originalBankDetails, setOriginalBankDetails] = useState<{id?: number, name: string, ifsc: string, account: string, branch: string} | null>(null)
+  const [shouldUpdateBankProfile, setShouldUpdateBankProfile] = useState(false)
 
   // Auto-format vehicle number to uppercase
   useEffect(() => {
@@ -278,6 +280,14 @@ export default function EditBillPage() {
     setBankIFSC(bank.bank_ifsc)
     setBankAccount(bank.bank_account)
     setBankBranch(bank.bank_branch || '')
+    setOriginalBankDetails({
+      id: bank.id,
+      name: bank.bank_name,
+      ifsc: bank.bank_ifsc,
+      account: bank.bank_account,
+      branch: bank.bank_branch || ''
+    })
+    setShouldUpdateBankProfile(false)
   }
 
   const fetchBillData = async () => {
@@ -477,6 +487,24 @@ export default function EditBillPage() {
           toast.error('Bill will be saved, but party GST update failed.')
         } else {
           toast.success('Party GST updated in settings!')
+        }
+      }
+
+      // --- SMART BANK SYNC ---
+      if (billType === 'pakki' && shouldUpdateBankProfile && originalBankDetails?.id) {
+        try {
+          await supabase
+            .from('saved_bank_details')
+            .update({
+              bank_name: bankName,
+              bank_ifsc: bankIFSC,
+              bank_account: bankAccount,
+              bank_branch: bankBranch
+            })
+            .eq('id', originalBankDetails.id)
+          console.log('✅ Bank Profile Updated Successfully')
+        } catch (err) {
+          console.error('❌ Failed to update bank profile:', err)
         }
       }
       console.log('Updating bill record...')
@@ -991,10 +1019,31 @@ export default function EditBillPage() {
                               placeholder="SANGLI BRANCH"
                               value={bankBranch}
                               onChange={(e) => setBankBranch(e.target.value)}
-                              className="h-10 bg-white"
-                            />
-                          </div>
+                            className="h-10 bg-white"
+                          />
                         </div>
+                      </div>
+
+                      {/* SMART BANK SYNC PROMPT */}
+                      {originalBankDetails && (
+                        (bankName !== originalBankDetails.name || 
+                         bankIFSC !== originalBankDetails.ifsc || 
+                         bankAccount !== originalBankDetails.account || 
+                         bankBranch !== originalBankDetails.branch)
+                      ) && (
+                        <div className="flex items-center gap-2 p-3 bg-orange-100/50 border border-orange-200 rounded-xl animate-in fade-in slide-in-from-top-1 mt-4">
+                          <input
+                            type="checkbox"
+                            id="sync-bank-toggle-edit"
+                            checked={shouldUpdateBankProfile}
+                            onChange={(e) => setShouldUpdateBankProfile(e.target.checked)}
+                            className="w-4 h-4 rounded border-orange-300 text-orange-600 focus:ring-orange-500 cursor-pointer"
+                          />
+                          <Label htmlFor="sync-bank-toggle-edit" className="text-xs font-bold text-orange-900 cursor-pointer">
+                            Update this Bank Profile in Settings?
+                          </Label>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}

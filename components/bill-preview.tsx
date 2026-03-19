@@ -580,7 +580,7 @@ export default function BillPreview({
                       <div className="bank-title">BANK DETAILS:</div>
                       <div className="bank-grid">
                         <div style={{ display: 'flex', gap: '8px' }}><span>BANK :</span> <span style={{ color: '#000' }}>{bankName}</span></div>
-                        <div style={{ display: 'flex', gap: '8px' }}><span>BRANCH :</span> <span style={{ color: '#000' }}>{bankBranch || 'SANGLI BRANCH'}</span></div>
+                        <div style={{ display: 'flex', gap: '8px' }}><span>BRANCH :</span> <span style={{ color: '#000' }}>{bankBranch || ''}</span></div>
                         <div style={{ display: 'flex', gap: '8px' }}><span>A/C NO :</span> <span style={{ color: '#000' }}>{bankAccount}</span></div>
                         <div style={{ display: 'flex', gap: '8px' }}><span>IFSC :</span> <span style={{ color: '#000' }}>{bankIFSC}</span></div>
                       </div>

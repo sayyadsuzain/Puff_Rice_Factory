@@ -48,6 +48,8 @@ export default function CreateBillPage() {
   const [bankIFSC, setBankIFSC] = useState('KARB0000729')
   const [bankAccount, setBankAccount] = useState('7292000100047001')
   const [bankBranch, setBankBranch] = useState('')
+  const [originalBankDetails, setOriginalBankDetails] = useState<{id?: number, name: string, ifsc: string, account: string, branch: string} | null>(null)
+  const [shouldUpdateBankProfile, setShouldUpdateBankProfile] = useState(false)
   const [showBankDetails, setShowBankDetails] = useState(false)
   const [savedBankDetails, setSavedBankDetails] = useState<SavedBankDetail[]>([])
   const [defaultBankId, setDefaultBankId] = useState<number | null>(null)
@@ -261,6 +263,14 @@ export default function CreateBillPage() {
     setBankIFSC(bank.bank_ifsc)
     setBankAccount(bank.bank_account)
     setBankBranch(bank.bank_branch || '')
+    setOriginalBankDetails({
+      id: bank.id,
+      name: bank.bank_name,
+      ifsc: bank.bank_ifsc,
+      account: bank.bank_account,
+      branch: bank.bank_branch || ''
+    })
+    setShouldUpdateBankProfile(false)
   }
 
   const handleDeleteBankDetail = async (id: number) => {
@@ -434,6 +444,7 @@ export default function CreateBillPage() {
         bank_name: billType === 'pakki' ? bankName : null,
         bank_ifsc: billType === 'pakki' ? bankIFSC : null,
         bank_account: billType === 'pakki' ? bankAccount : null,
+        bank_branch: billType === 'pakki' ? bankBranch : null,
         // CA reporting fields
         financial_year: getFinancialYear(new Date(billDate)),
         month_number: new Date(billDate).getMonth() + 1,
@@ -478,6 +489,24 @@ export default function CreateBillPage() {
       console.log('Bill items created successfully')
 
       toast.success(`Bill created successfully! (${billType})`)
+
+      // --- SMART BANK SYNC ---
+      if (billType === 'pakki' && shouldUpdateBankProfile && originalBankDetails?.id) {
+        try {
+          await supabase
+            .from('saved_bank_details')
+            .update({
+              bank_name: bankName,
+              bank_ifsc: bankIFSC,
+              bank_account: bankAccount,
+              bank_branch: bankBranch
+            })
+            .eq('id', originalBankDetails.id)
+          console.log('✅ Bank Profile Updated Successfully')
+        } catch (err) {
+          console.error('❌ Failed to update bank profile:', err)
+        }
+      }
 
       console.log('🎉 BILL CREATED - About to redirect...')
       console.log('Bill ID:', billId)
@@ -751,28 +780,28 @@ export default function CreateBillPage() {
                   {/* STEP 6: BANK (PAKKI ONLY) */}
                   {billType === 'pakki' && (
                     <div className="space-y-5 p-4 sm:p-5 bg-orange-50/50 rounded-xl border border-orange-100 shadow-sm">
-                       <div className="flex items-center justify-between">
-                         <h3 className="text-lg font-bold text-orange-900 flex items-center gap-2">
-                          <span className="bg-orange-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-black">6</span>
-                          Bank Information
-                        </h3>
-                        <div className="flex gap-2">
-                          <Button 
-                            type="button" 
-                            variant="outline" 
-                            size="sm" 
-                            onClick={handleSaveBankDetails}
-                            className="h-8 text-[10px] sm:text-xs font-bold border-orange-200 text-orange-700 bg-white"
-                          >
-                            Save Details
-                          </Button>
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-lg font-bold text-orange-900 flex items-center gap-2">
+                           <span className="bg-orange-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-black">6</span>
+                           Bank Information
+                         </h3>
                         </div>
-                       </div>
 
                       <div className="space-y-5">
                         {savedBankDetails.length > 0 && (
                           <div className="space-y-3">
-                            <Label className="text-xs font-bold text-orange-800 uppercase">Saved Bank Profiles</Label>
+                            <div className="flex items-center justify-between">
+                              <Label className="text-xs font-bold text-orange-800 uppercase">Saved Bank Profiles</Label>
+                              <Button 
+                                type="button" 
+                                variant="outline" 
+                                size="sm" 
+                                onClick={handleSaveBankDetails}
+                                className="h-7 text-[9px] font-bold border-orange-200 text-orange-700 bg-white"
+                              >
+                                Keep for Future
+                              </Button>
+                            </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
                               {savedBankDetails.map((bank) => (
                                 <div 
@@ -876,6 +905,27 @@ export default function CreateBillPage() {
                             />
                           </div>
                         </div>
+
+                        {/* SMART BANK SYNC PROMPT */}
+                        {originalBankDetails && (
+                          (bankName !== originalBankDetails.name || 
+                           bankIFSC !== originalBankDetails.ifsc || 
+                           bankAccount !== originalBankDetails.account || 
+                           bankBranch !== originalBankDetails.branch)
+                        ) && (
+                          <div className="flex items-center gap-2 p-3 bg-orange-100/50 border border-orange-200 rounded-xl animate-in fade-in slide-in-from-top-1">
+                            <input
+                              type="checkbox"
+                              id="sync-bank-toggle"
+                              checked={shouldUpdateBankProfile}
+                              onChange={(e) => setShouldUpdateBankProfile(e.target.checked)}
+                              className="w-4 h-4 rounded border-orange-300 text-orange-600 focus:ring-orange-500 cursor-pointer"
+                            />
+                            <Label htmlFor="sync-bank-toggle" className="text-xs font-bold text-orange-900 cursor-pointer">
+                              Update this Bank Profile in Settings?
+                            </Label>
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
