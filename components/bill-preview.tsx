@@ -118,7 +118,7 @@ export default function BillPreview({
           >
             <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&display=swap" rel="stylesheet" />
 
-            {/* Watermark — Fainter and more professional */}
+            {/* Watermark — Ultra-subtle premium branding */}
             <div
               className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none z-0"
               style={{ 
@@ -126,7 +126,7 @@ export default function BillPreview({
                 fontWeight: 900, 
                 fontFamily: '"Inter", sans-serif', 
                 color: '#000',
-                opacity: 0.015,
+                opacity: 0.008,
                 textAlign: 'center',
                 lineHeight: 1,
                 letterSpacing: '-0.02em'
