@@ -131,7 +131,7 @@ const BILL_CSS = `
     margin-top: 4px;
   }
   .red-divider-sub {
-    border-bottom: 0.5px solid #dc2626;
+    border-bottom: 1px solid #dc2626;
     margin-top: 1px;
   }
 
@@ -159,7 +159,7 @@ const BILL_CSS = `
   }
 
   .party-details {
-    border: 0.5px solid #d1d5db;
+    border: 1px solid #d1d5db;
     border-radius: 4px;
     padding: 6px 10px;
     margin-bottom: 8px;
@@ -171,7 +171,7 @@ const BILL_CSS = `
   }
 
   .party-name-underline {
-    border-bottom: 0.5px dotted #9ca3af;
+    border-bottom: 1px dotted #9ca3af;
     min-width: 250px;
     display: inline-block;
   }
@@ -200,14 +200,14 @@ const BILL_CSS = `
 
   .items-table thead tr {
     background-color: #f9fafb;
-    border-top: 0.5px solid #9ca3af;
-    border-bottom: 0.5px solid #9ca3af;
+    border-top: 1px solid #9ca3af;
+    border-bottom: 1px solid #9ca3af;
     height: 28px;
   }
 
   .items-table th {
-    border-left: 0.5px solid #9ca3af;
-    border-right: 0.5px solid #9ca3af;
+    border-left: 1px solid #9ca3af;
+    border-right: 1px solid #9ca3af;
     padding: 2px 6px;
     text-align: left;
     font-weight: 900;
@@ -216,8 +216,8 @@ const BILL_CSS = `
   }
 
   .items-table td {
-    border-left: 0.5px solid #9ca3af;
-    border-right: 0.5px solid #9ca3af;
+    border-left: 1px solid #9ca3af;
+    border-right: 1px solid #9ca3af;
     padding: 3px 6px;
     vertical-align: top;
   }
@@ -313,7 +313,7 @@ const BILL_CSS = `
     width: 140px;
     margin-left: auto;
     text-align: center;
-    border-top: 0.5px solid #9ca3af;
+    border-top: 1px solid #9ca3af;
     padding-top: 2px;
     color: #4b5563;
   }
@@ -483,19 +483,19 @@ export default function BillDisplay({ bill, items, partyName, partyGst }: BillDi
                   ))}
                   {Array.from({ length: Math.max(0, 16 - items.length) }).map((_, idx) => (
                     <tr key={`empty-${idx}`} className="item-row">
-                      <td style={{ borderLeft: '0.5px solid #9ca3af', borderRight: '0.5px solid #9ca3af' }}></td>
-                      <td style={{ borderLeft: '0.5px solid #9ca3af', borderRight: '0.5px solid #9ca3af' }}></td>
-                      <td style={{ borderLeft: '0.5px solid #9ca3af', borderRight: '0.5px solid #9ca3af' }}></td>
-                      <td style={{ borderLeft: '0.5px solid #9ca3af', borderRight: '0.5px solid #9ca3af' }}></td>
-                      <td style={{ borderLeft: '0.5px solid #9ca3af', borderRight: '0.5px solid #9ca3af' }}></td>
+                      <td style={{ borderLeft: '1px solid #9ca3af', borderRight: '1px solid #9ca3af' }}></td>
+                      <td style={{ borderLeft: '1px solid #9ca3af', borderRight: '1px solid #9ca3af' }}></td>
+                      <td style={{ borderLeft: '1px solid #9ca3af', borderRight: '1px solid #9ca3af' }}></td>
+                      <td style={{ borderLeft: '1px solid #9ca3af', borderRight: '1px solid #9ca3af' }}></td>
+                      <td style={{ borderLeft: '1px solid #9ca3af', borderRight: '1px solid #9ca3af' }}></td>
                     </tr>
                   ))}
                   <tr className="spacer-row">
-                    <td style={{ borderBottom: '0.5px solid #9ca3af' }}></td>
-                    <td style={{ borderBottom: '0.5px solid #9ca3af' }}></td>
-                    <td style={{ borderBottom: '0.5px solid #9ca3af' }}></td>
-                    <td style={{ borderBottom: '0.5px solid #9ca3af' }}></td>
-                    <td style={{ borderBottom: '0.5px solid #9ca3af' }}></td>
+                    <td style={{ borderBottom: '1px solid #9ca3af' }}></td>
+                    <td style={{ borderBottom: '1px solid #9ca3af' }}></td>
+                    <td style={{ borderBottom: '1px solid #9ca3af' }}></td>
+                    <td style={{ borderBottom: '1px solid #9ca3af' }}></td>
+                    <td style={{ borderBottom: '1px solid #9ca3af' }}></td>
                   </tr>
                 </tbody>
               </table>
@@ -519,7 +519,7 @@ export default function BillDisplay({ bill, items, partyName, partyGst }: BillDi
                   </div>
       
                   {!isKacchi && bill.is_gst_enabled && (bill.gst_total || 0) > 0 ? (
-                    <div style={{ marginTop: '4px', borderTop: '0.5px solid #f3f4f6', paddingTop: '4px' }}>
+                    <div style={{ marginTop: '4px', borderTop: '1px solid #f3f4f6', paddingTop: '4px' }}>
                       {(bill.cgst_percent || 0) > 0 && (
                         <div className="total-row">
                           <span style={{ color: '#4b5563' }}>CGST @ {bill.cgst_percent}%</span>
@@ -532,7 +532,7 @@ export default function BillDisplay({ bill, items, partyName, partyGst }: BillDi
                           <span style={{ fontWeight: 'bold', color: 'black' }}>₹ {(bill.igst_amount || 0).toFixed(2)}</span>
                         </div>
                       )}
-                      <div className="total-row" style={{ fontWeight: 'bold', paddingTop: '4px', borderTop: '0.5px solid #f3f4f6', marginTop: '2px' }}>
+                      <div className="total-row" style={{ fontWeight: 'bold', paddingTop: '4px', borderTop: '1px solid #f3f4f6', marginTop: '2px' }}>
                         <span style={{ color: '#4b5563' }}>GST Total:</span>
                         <span>₹ {(bill.gst_total || 0).toFixed(2)}</span>
                       </div>
@@ -568,7 +568,7 @@ export default function BillDisplay({ bill, items, partyName, partyGst }: BillDi
                     </>
                   ) : null}
                 </div>
-                <div style={{ textAlign: 'right' }}>
+                <div style={{ textAlign: 'right', marginLeft: 'auto' }}>
                   <div className="signatory-title">For M S TRADING COMPANY</div>
                   <div className="signatory-line">Auth. Signatory</div>
                 </div>

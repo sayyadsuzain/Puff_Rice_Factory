@@ -583,7 +583,7 @@ export default function BillPreview({
                       </div>
                     </div>
                   )}
-                  <div style={{ textAlign: 'right' }}>
+                  <div style={{ textAlign: 'right', marginLeft: 'auto' }}>
                     <div className="signatory-title">For M S TRADING COMPANY</div>
                     <div className="signatory-line">Auth. Signatory</div>
                   </div>
