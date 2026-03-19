@@ -426,11 +426,11 @@ export default function BillPreview({
                   <div style={{ textAlign: 'center' }}>
                     <div className="memo-badge">{isKacchi ? 'CASH / CREDIT MEMO' : 'CREDIT MEMO'}</div>
                   </div>
-                  <div className="contact-info">
-                    <div style={{ textTransform: 'uppercase' }}>Contact:</div>
-                    <div style={{ fontWeight: '900', color: '#dc2626' }}>PH: 9850280800</div>
-                    <div style={{ fontWeight: '900', color: '#dc2626' }}>PH: 8855050505</div>
-                  </div>
+                    <div className="contact-info text-right" style={{ fontSize: '13px', fontWeight: 'bold', color: '#1f2937' }}>
+                      <div className="uppercase">Contact:</div>
+                      <div style={{ fontWeight: 900, color: '#dc2626' }}>{isKacchi ? '9860022450' : '9850280800'}</div>
+                      <div style={{ fontWeight: 900, color: '#dc2626' }}>{isKacchi ? '9561420666' : '8855050505'}</div>
+                    </div>
                 </div>
                 
                 <h1 className="company-name">M S TRADING COMPANY</h1>

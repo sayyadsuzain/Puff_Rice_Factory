@@ -279,7 +279,7 @@ export async function POST(request: NextRequest) {
  
           .contact-info {
             text-align: right;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
             color: #1f2937;
           }
@@ -506,7 +506,7 @@ export async function POST(request: NextRequest) {
           }
  
           .signatory-title {
-            font-size: 9px;
+            font-size: 12px;
             font-weight: bold;
             color: #dc2626;
             margin-bottom: 20px;
@@ -514,7 +514,7 @@ export async function POST(request: NextRequest) {
           }
  
           .signatory-line {
-            font-size: 8px;
+            font-size: 11px;
             font-weight: 500;
             width: 140px;
             margin-left: auto;
@@ -710,11 +710,11 @@ function generateBillHTML(bill: any, items: any[], pageNumber: number, totalPage
             <div class="contact-info">
               <div style="text-transform: uppercase;">Contact:</div>
               ${isKacchi ? `
-                <div style="font-weight: 900; color: #dc2626;">PH: 9860022450</div>
-                <div style="font-weight: 900; color: #dc2626;">PH: 9561420666</div>
+                <div style="font-weight: 900; color: #dc2626;">9860022450</div>
+                <div style="font-weight: 900; color: #dc2626;">9561420666</div>
               ` : `
-                <div style="font-weight: 900; color: #dc2626;">PH: 9850280800</div>
-                <div style="font-weight: 900; color: #dc2626;">PH: 8855050505</div>
+                <div style="font-weight: 900; color: #dc2626;">9850280800</div>
+                <div style="font-weight: 900; color: #dc2626;">8855050505</div>
               `}
             </div>
           </div>

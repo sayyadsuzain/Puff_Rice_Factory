@@ -87,7 +87,7 @@ export const BILL_CSS = `
 
   .contact-info {
     text-align: right;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: bold;
     color: #1f2937;
   }
@@ -314,7 +314,7 @@ export const BILL_CSS = `
   }
 
   .signatory-title {
-    font-size: 9px;
+    font-size: 12px;
     font-weight: bold;
     color: #dc2626;
     margin-bottom: 20px;
@@ -322,7 +322,7 @@ export const BILL_CSS = `
   }
 
   .signatory-line {
-    font-size: 8px;
+    font-size: 11px;
     font-weight: 500;
     width: 140px;
     margin-left: auto;
