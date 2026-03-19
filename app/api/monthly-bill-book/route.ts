@@ -601,7 +601,7 @@ export async function POST(request: NextRequest) {
         headers: {
           'Content-Type': 'application/pdf',
           'Content-Disposition': `attachment; filename=${filename}`,
-          'Link': '</favicon.ico?v=10>; rel="icon"',
+          'Link': '</favicon.ico?v=11>; rel="icon"',
           'X-Frame-Options': 'SAMEORIGIN'
         }
       })

@@ -461,7 +461,7 @@ export default function BillPreview({
                   <span style={{ fontWeight: 'bold' }}>M/s. </span>
                   <span className="party-name-underline">{partyName || '_'.repeat(40)}</span>
                 </div>
-                {(vehicleNumber || (!isKacchi && partyGst)) ? (
+                {(vehicleNumber || (!isKacchi && gstEnabled && partyGst)) ? (
                   <div className="vehicle-gst-row">
                     {vehicleNumber ? (
                       <div>
@@ -469,7 +469,7 @@ export default function BillPreview({
                         <span>{vehicleNumber}</span>
                       </div>
                     ) : <div></div>}
-                    {!isKacchi && partyGst ? (
+                    {!isKacchi && gstEnabled && partyGst ? (
                       <div>
                         <span style={{ color: '#4b5563' }}>GST No.: </span>
                         <span>{partyGst}</span>
