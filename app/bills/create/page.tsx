@@ -853,7 +853,7 @@ export default function CreateBillPage() {
           </div>
 
           {/* Preview Section */}
-          <div className="flex flex-col h-full bg-white/50 rounded-2xl border border-gray-200 overflow-hidden min-h-[500px] xl:min-h-0">
+          <div className="flex flex-col xl:h-full bg-white/50 rounded-2xl border border-gray-200 overflow-hidden min-h-[700px] xl:min-h-0">
             <div className="p-3 border-b bg-gray-50 text-[10px] font-black text-gray-400 uppercase tracking-widest flex justify-between items-center">
               <span>Live PDF Preview Engine</span>
               <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-md font-black italic">A4 Scaled v2.0</span>
