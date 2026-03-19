@@ -99,6 +99,7 @@ export const BILL_CSS = `
     color: #dc2626;
     letter-spacing: -0.02em;
     margin: -10px 0 0 0;
+    font-family: "Playfair Display", serif;
   }
 
   .company-address {

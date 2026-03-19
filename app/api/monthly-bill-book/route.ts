@@ -189,7 +189,7 @@ export async function POST(request: NextRequest) {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;900&display=swap" rel="stylesheet">
         <script src="https://cdn.tailwindcss.com"></script>
         <style>
           @page {
@@ -291,6 +291,7 @@ export async function POST(request: NextRequest) {
             color: #dc2626;
             letter-spacing: -0.02em;
             margin: -10px 0 0 0;
+            font-family: "Playfair Display", serif;
           }
  
           .company-address {
