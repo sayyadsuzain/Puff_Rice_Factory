@@ -495,11 +495,7 @@ export default function CreateBillPage() {
                     
                     <PartySearch
                       value={partyName}
-                      onChange={(id, name) => {
-                        setSelectedPartyId(id)
-                        setPartyName(name)
-                        // If it's a known party, we'd fetch GST here, but PartySearch handles its own internal state
-                      }}
+                      onChange={handlePartySelect}
                       placeholder="Start typing party name..."
                       required
                     />

@@ -15,6 +15,7 @@ import { supabase, Bill, BillItem, FIXED_PRODUCTS, COMPANY_INFO } from '@/lib/su
 import BillPreview from '@/components/bill-preview'
 import BillItemForm from '@/components/bill-item-form'
 import { GSTToggle } from '@/components/gst-toggle'
+import { PartySearch } from '@/components/party-search'
 import { ProtectedRoute } from '@/components/protected-route'
 
 export const dynamic = 'force-dynamic'
@@ -24,6 +25,7 @@ export default function EditBillPage() {
   const billId = parseInt(params.id as string)
 
   const [billType, setBillType] = useState<'kacchi' | 'pakki'>('kacchi')
+  const [selectedPartyId, setSelectedPartyId] = useState<number | null>(null)
   const [partyName, setPartyName] = useState('')
   const [billDate, setBillDate] = useState(new Date().toISOString().split('T')[0])
   const [items, setItems] = useState<Partial<BillItem>[]>([])
@@ -134,6 +136,27 @@ export default function EditBillPage() {
     return result.trim()
   }
 
+  const handlePartySelect = (partyId: number | null, name: string) => {
+    setSelectedPartyId(partyId)
+    setPartyName(name)
+
+    // Fetch party GST if party is selected
+    if (partyId) {
+      supabase
+        .from('parties')
+        .select('gst_number')
+        .eq('id', partyId)
+        .single()
+        .then(({ data, error }) => {
+          if (!error && data) {
+            setPartyGst(data.gst_number || '')
+          }
+        })
+    } else {
+      setPartyGst('')
+    }
+  }
+
   const fetchBillData = async () => {
     console.log('EDIT PAGE: fetchBillData called')
     try {
@@ -181,6 +204,7 @@ export default function EditBillPage() {
 
           if (!partyError && partyData) {
             console.log('✅ EDIT PAGE: Party data fetched:', partyData)
+            setSelectedPartyId(billData.party_id)
             setPartyName(partyData.name)
             setPartyGst(partyData.gst_number || '')
           } else {
@@ -528,17 +552,18 @@ export default function EditBillPage() {
 
                   <div className="space-y-2">
                     <Label className="text-sm md:text-base font-medium">Party Name (M/s.)</Label>
-                    <Input
-                      placeholder="Enter customer/party name"
+                    <PartySearch
                       value={partyName}
-                      onChange={(e) => setPartyName(e.target.value)}
-                      className="text-sm md:text-base"
+                      onChange={handlePartySelect}
+                      placeholder="Start typing party name..."
+                      required
                     />
                   </div>
 
                   {partyGst && billType === 'pakki' && (
-                    <div className="text-sm text-green-700 bg-green-100 p-2 rounded">
-                      Party GST: <span className="font-semibold">{partyGst}</span>
+                    <div className="text-xs font-bold text-emerald-700 bg-emerald-50 p-2.5 rounded-lg border border-emerald-100 flex items-center gap-2 shadow-sm animate-in fade-in slide-in-from-top-1">
+                      <span className="opacity-60 uppercase tracking-wider text-[10px]">GSTIN:</span> 
+                      <span className="font-mono">{partyGst}</span>
                     </div>
                   )}
                 </div>
