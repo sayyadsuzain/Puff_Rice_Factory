@@ -361,8 +361,8 @@ export default function BillDisplay({ bill, items, partyName, partyGst }: BillDi
       toast.loading('Opening PDF preview...', { id: 'print' })
       const { data: { session } } = await supabase.auth.getSession()
       const token = session?.access_token
-      const pdfUrl = `/api/bill-pdf?id=${bill.id}${token ? `&token=${token}` : ''}`
-      window.open(pdfUrl, '_blank')
+      const printUrl = `/print?id=${bill.id}${token ? `&token=${token}` : ''}`
+      window.open(printUrl, '_blank')
       toast.success('PDF preview opened!', { id: 'print' })
     } catch (error) {
       toast.error('Error generating PDF', { id: 'print' })
