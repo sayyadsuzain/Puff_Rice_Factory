@@ -330,7 +330,7 @@ export default function BillDisplay({ bill, items, partyName, partyGst }: BillDi
   useEffect(() => {
     const calculateScale = () => {
       if (!containerRef.current) return
-      const containerWidth = containerRef.current.offsetWidth
+      const containerWidth = containerRef.current.getBoundingClientRect().width
       const padding = 32 // Total horizontal padding
       
       if (containerWidth < BILL_W + padding) {
