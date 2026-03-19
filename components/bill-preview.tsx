@@ -433,7 +433,7 @@ export default function BillPreview({
                     </div>
                 </div>
                 
-                <h1 className="company-name">M S TRADING COMPANY</h1>
+                <h1 className="company-name" style={{ margin: '-10px 0 0 0' }}>M S TRADING COMPANY</h1>
                 <div className="company-address">KUPWAD MIDC NEAR NAV KRISHNA VALLEY, PLOT NO L-52</div>
                 {!isKacchi && <div className="company-gst">GST IN : {COMPANY_INFO.gst}</div>}
                 
@@ -580,9 +580,7 @@ export default function BillPreview({
                       <div className="bank-title">BANK DETAILS:</div>
                       <div className="bank-grid">
                         <div style={{ display: 'flex', gap: '8px' }}><span>BANK :</span> <span style={{ color: '#000' }}>{bankName}</span></div>
-                        {bankBranch && (
-                          <div style={{ display: 'flex', gap: '8px' }}><span>BRANCH :</span> <span style={{ color: '#000' }}>{bankBranch}</span></div>
-                        )}
+                        <div style={{ display: 'flex', gap: '8px' }}><span>BRANCH :</span> <span style={{ color: '#000' }}>{bankBranch || 'SANGLI BRANCH'}</span></div>
                         <div style={{ display: 'flex', gap: '8px' }}><span>A/C NO :</span> <span style={{ color: '#000' }}>{bankAccount}</span></div>
                         <div style={{ display: 'flex', gap: '8px' }}><span>IFSC :</span> <span style={{ color: '#000' }}>{bankIFSC}</span></div>
                       </div>

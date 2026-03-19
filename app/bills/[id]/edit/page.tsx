@@ -262,7 +262,7 @@ export default function EditBillPage() {
     setBankName(bank.bank_name)
     setBankIFSC(bank.bank_ifsc)
     setBankAccount(bank.bank_account)
-    setBankBranch(bank.bank_branch || '')
+    setBankBranch(bank.bank_branch || 'SANGLI BRANCH')
   }
 
   const fetchBillData = async () => {

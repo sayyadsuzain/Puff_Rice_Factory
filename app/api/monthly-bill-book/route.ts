@@ -290,7 +290,7 @@ export async function POST(request: NextRequest) {
             font-weight: bold;
             color: #dc2626;
             letter-spacing: -0.02em;
-            margin: 0;
+            margin: -10px 0 0 0;
           }
  
           .company-address {
@@ -848,10 +848,10 @@ function generateBillHTML(bill: any, items: any[], pageNumber: number, totalPage
               ${(!isKacchi && bill.bank_name) ? `
                 <div class="bank-title">BANK DETAILS:</div>
                 <div class="bank-grid">
-                  <div style="display: flex; gap: 8px;"><span>BANK :</span> <span style="color: #111827;">${bill.bank_name}</span></div>
-                  ${bill.bank_branch ? `<div style="display: flex; gap: 8px;"><span>BRANCH :</span> <span style="color: #111827;">${bill.bank_branch}</span></div>` : ''}
-                  <div style="display: flex; gap: 8px;"><span>A/C NO :</span> <span style="color: #111827;">${bill.bank_account}</span></div>
-                  <div style="display: flex; gap: 8px;"><span>IFSC :</span> <span style="color: #111827;">${bill.bank_ifsc}</span></div>
+                  <div style="display: flex; gap: 8px;"><span>BANK :</span> <span style="color: #000;">${bill.bank_name}</span></div>
+                  <div style="display: flex; gap: 8px;"><span>BRANCH :</span> <span style="color: #000;">${bill.bank_branch || 'SANGLI BRANCH'}</span></div>
+                  <div style="display: flex; gap: 8px;"><span>A/C NO :</span> <span style="color: #000;">${bill.bank_account}</span></div>
+                  <div style="display: flex; gap: 8px;"><span>IFSC :</span> <span style="color: #000;">${bill.bank_ifsc}</span></div>
                 </div>
               ` : ''}
             </div>

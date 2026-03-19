@@ -104,7 +104,7 @@ const BILL_CSS = `
     font-weight: bold;
     color: #dc2626;
     letter-spacing: -0.02em;
-    margin: 0;
+    margin: -10px 0 0 0;
     font-family: "Playfair Display", serif;
   }
 
@@ -591,9 +591,7 @@ export default function BillDisplay({ bill, items, partyName, partyGst }: BillDi
                       <div className="bank-title">BANK DETAILS:</div>
                       <div className="bank-grid">
                         <div style={{ display: 'flex', gap: '8px' }}><span>BANK :</span> <span style={{ color: '#000' }}>{bill.bank_name}</span></div>
-                        {bill.bank_branch && (
-                          <div style={{ display: 'flex', gap: '8px' }}><span>BRANCH :</span> <span style={{ color: '#000' }}>{bill.bank_branch}</span></div>
-                        )}
+                        <div style={{ display: 'flex', gap: '8px' }}><span>BRANCH :</span> <span style={{ color: '#000' }}>{bill.bank_branch || 'SANGLI BRANCH'}</span></div>
                         <div style={{ display: 'flex', gap: '8px' }}><span>A/C NO :</span> <span style={{ color: '#000' }}>{bill.bank_account}</span></div>
                         <div style={{ display: 'flex', gap: '8px' }}><span>IFSC :</span> <span style={{ color: '#000' }}>{bill.bank_ifsc}</span></div>
                       </div>

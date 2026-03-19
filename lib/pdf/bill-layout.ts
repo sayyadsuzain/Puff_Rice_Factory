@@ -84,7 +84,7 @@ export function generateBillHTML(
               </div>
             </div>
             
-            <h1 class="company-name">M S TRADING COMPANY</h1>
+            <h1 class="company-name" style="margin: -10px 0 0 0;">M S TRADING COMPANY</h1>
             <div class="company-address">KUPWAD MIDC NEAR NAV KRISHNA VALLEY, PLOT NO L-52</div>
             ${!isKacchi ? `<div class="company-gst">GST IN : ${companyGst}</div>` : ''}
             
@@ -214,7 +214,7 @@ export function generateBillHTML(
                   <div class="bank-title">BANK DETAILS:</div>
                   <div class="bank-grid">
                     <div style="display: flex; gap: 8px;"><span>BANK :</span> <span style="color: #000;">${bill.bank_name}</span></div>
-                    ${bill.bank_branch ? `<div style="display: flex; gap: 8px;"><span>BRANCH :</span> <span style="color: #000;">${bill.bank_branch}</span></div>` : ''}
+                    <div style="display: flex; gap: 8px;"><span>BRANCH :</span> <span style="color: #000;">${bill.bank_branch || 'SANGLI BRANCH'}</span></div>
                     <div style="display: flex; gap: 8px;"><span>A/C NO :</span> <span style="color: #000;">${bill.bank_account}</span></div>
                     <div style="display: flex; gap: 8px;"><span>IFSC :</span> <span style="color: #000;">${bill.bank_ifsc}</span></div>
                   </div>

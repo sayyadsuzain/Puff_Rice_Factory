@@ -55,7 +55,7 @@ export const BILL_CSS = `
 
   .header-top {
     width: 100%;
-    margin-bottom: 2px;
+    margin-bottom: 0px;
   }
   
   .jurisdiction {
@@ -98,7 +98,7 @@ export const BILL_CSS = `
     font-weight: bold;
     color: #dc2626;
     letter-spacing: -0.02em;
-    margin: 0;
+    margin: -10px 0 0 0;
   }
 
   .company-address {
