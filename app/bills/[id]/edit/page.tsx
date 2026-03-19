@@ -701,6 +701,40 @@ export default function EditBillPage() {
                       placeholder="Start typing party name..."
                       required
                     />
+
+                    {billType === 'pakki' && isGstEnabled && (
+                      <div className="space-y-3 pt-2">
+                        <div className="space-y-1.5">
+                          <Label className="text-[10px] font-black text-emerald-800 uppercase tracking-widest pl-1">Modify Party GST (Optional)</Label>
+                          <div className="relative group">
+                            <Input
+                              placeholder="27XXXXX0000X0Z0"
+                              value={partyGst}
+                              onChange={(e) => setPartyGst(e.target.value.toUpperCase())}
+                              className="h-10 bg-white font-mono uppercase font-bold border-emerald-200 focus:border-emerald-500 focus:ring-emerald-500/20 transition-all pl-9"
+                            />
+                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-500 opacity-50 group-hover:opacity-100 transition-opacity">
+                              <span className="text-[10px] font-black">GST</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {partyGst !== originalPartyGst && selectedPartyId && (
+                          <div className="flex items-center gap-2 p-2.5 bg-amber-50 border border-amber-200 rounded-lg animate-in fade-in slide-in-from-top-1">
+                            <input
+                              type="checkbox"
+                              id="sync-gst-edit"
+                              checked={shouldUpdatePartyGst}
+                              onChange={(e) => setShouldUpdatePartyGst(e.target.checked)}
+                              className="w-4 h-4 rounded border-amber-300 text-amber-600 focus:ring-amber-500 cursor-pointer"
+                            />
+                            <Label htmlFor="sync-gst-edit" className="text-[11px] font-bold text-amber-900 cursor-pointer">
+                              Update this GST number in Party Settings?
+                            </Label>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                 </div>
