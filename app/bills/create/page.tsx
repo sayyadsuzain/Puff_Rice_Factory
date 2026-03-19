@@ -662,10 +662,12 @@ export default function CreateBillPage() {
                       </h3>
 
                       <div className="space-y-4">
-                        <div className="bg-white/80 p-3 rounded-lg border border-indigo-100">
-                          <Label className="text-xs font-bold text-indigo-700 uppercase mb-1 block">Your GST Number</Label>
-                          <p className="font-mono text-sm font-bold text-gray-800">{COMPANY_INFO.gst}</p>
-                        </div>
+                        {isGstEnabled && (
+                          <div className="bg-white/80 p-3 rounded-lg border border-indigo-100">
+                            <Label className="text-xs font-bold text-indigo-700 uppercase mb-1 block">Your GST Number</Label>
+                            <p className="font-mono text-sm font-bold text-gray-800">{COMPANY_INFO.gst}</p>
+                          </div>
+                        )}
 
                         <GSTToggle
                           isEnabled={isGstEnabled}

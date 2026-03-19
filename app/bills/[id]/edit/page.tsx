@@ -775,14 +775,16 @@ export default function EditBillPage() {
                     </h3>
 
                     <div className="space-y-3">
-                      <div className="bg-white p-3 rounded border">
-                        <Label className="text-sm font-medium">Company GST Number</Label>
-                        <Input
-                          value={COMPANY_INFO.gst}
-                          disabled
-                          className="bg-muted text-sm mt-1"
-                        />
-                      </div>
+                      {isGstEnabled && (
+                        <div className="bg-white p-3 rounded border">
+                          <Label className="text-sm font-medium">Company GST Number</Label>
+                          <Input
+                            value={COMPANY_INFO.gst}
+                            disabled
+                            className="bg-muted text-sm mt-1"
+                          />
+                        </div>
+                      )}
 
                       <GSTToggle
                         isEnabled={isGstEnabled}
