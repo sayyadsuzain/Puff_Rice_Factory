@@ -4,7 +4,7 @@ import { Bill, BillItem, COMPANY_INFO, formatDate, supabase, numberToWords } fro
 import { Button } from '@/components/ui/button'
 import { Printer } from 'lucide-react'
 import { toast } from 'sonner'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 
 interface BillDisplayProps {
   bill: Bill
@@ -325,19 +325,35 @@ export default function BillDisplay({ bill, items, partyName, partyGst }: BillDi
   const totalInWords = numberToWords(grandTotal)
   
   const [scale, setScale] = useState(1)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const calculateScale = () => {
-      const width = window.innerWidth
-      if (width < 794) {
-        setScale((width - 32) / 794)
+      if (!containerRef.current) return
+      const containerWidth = containerRef.current.offsetWidth
+      const padding = 32 // Total horizontal padding
+      
+      if (containerWidth < BILL_W + padding) {
+        const availableWidth = containerWidth - padding
+        setScale(Math.max(0.25, availableWidth / BILL_W))
       } else {
         setScale(1)
       }
     }
+
     calculateScale()
+    
+    const observer = new ResizeObserver(calculateScale)
+    if (containerRef.current) {
+      observer.observe(containerRef.current)
+    }
+
     window.addEventListener('resize', calculateScale)
-    return () => window.removeEventListener('resize', calculateScale)
+    
+    return () => {
+      observer.disconnect()
+      window.removeEventListener('resize', calculateScale)
+    }
   }, [])
 
   const handlePrint = async () => {
@@ -385,17 +401,21 @@ export default function BillDisplay({ bill, items, partyName, partyGst }: BillDi
         </Button>
       </div>
 
-      {/* Shared PDF-fidelity Layout */}
+      {/* Shared PDF-fidelity Layout Container */}
       <div 
-        style={{ 
-          width: BILL_W, 
-          height: BILL_H, 
-          transform: `scale(${scale})`, 
-          transformOrigin: 'top center',
-          marginBottom: `calc(${BILL_H}px * (${scale} - 1))`
-        }}
-        className="shadow-2xl overflow-hidden"
+        ref={containerRef}
+        className="w-full flex justify-center overflow-hidden"
       >
+        <div 
+          style={{ 
+            width: BILL_W, 
+            height: BILL_H, 
+            transform: `scale(${scale})`, 
+            transformOrigin: 'top center',
+            marginBottom: `calc(${BILL_H}px * (${scale} - 1))`
+          }}
+          className="shadow-2xl overflow-hidden bg-white"
+        >
         <div className="a4-page relative">
           <div className="watermark-ms">MS</div>
           
@@ -576,6 +596,7 @@ export default function BillDisplay({ bill, items, partyName, partyGst }: BillDi
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   )

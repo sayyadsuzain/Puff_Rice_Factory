@@ -128,8 +128,8 @@ export default function BillDetailPage() {
       const filename = `${safeBillNumber} - ${partyName}.pdf`
       const downloadUrl = `/api/bill-pdf-download?id=${billId}${token ? `&token=${token}` : ''}`
 
-      // Detect mobile viewports
-      const isMobile = window.innerWidth < 1024
+      // Detect mobile/tablet viewports (including iPad 1024px)
+      const isMobile = window.innerWidth <= 1024 || (typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0)
 
       if (isMobile) {
         // Fetch the blob first to see if it's healthy
