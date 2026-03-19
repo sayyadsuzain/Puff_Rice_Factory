@@ -50,7 +50,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-6 sm:space-y-8">
         <div className="text-center">
-          <h1 className={`${playfair.className} text-2xl sm:text-3xl font-bold text-black uppercase tracking-tight`}>MS TRADING COMPANY</h1>
+          <h1 className={`${playfair.className} text-2xl sm:text-3xl font-bold text-red-600 uppercase tracking-tight`}>MS TRADING COMPANY</h1>
           <p className="mt-2 text-sm sm:text-base text-gray-600">Bill Management System</p>
           <p className="mt-1 text-xs text-gray-500">Authorized Personnel Only</p>
         </div>
@@ -111,7 +111,7 @@ export default function LoginPage() {
             <div className="mt-6 text-center">
               <div className="text-sm text-gray-600">
                 <p className="font-medium">Authorized User:</p>
-                <p className={`${playfair.className} mt-2 text-sm font-semibold text-black uppercase`}>MS TRADING COMPANY</p>
+                <p className={`${playfair.className} mt-2 text-sm font-semibold text-red-600 uppercase`}>MS TRADING COMPANY</p>
               </div>
             </div>
           </CardContent>
