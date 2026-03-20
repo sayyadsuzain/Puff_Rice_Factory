@@ -601,7 +601,7 @@ export async function POST(request: NextRequest) {
         headers: {
           'Content-Type': 'application/pdf',
           'Content-Disposition': `attachment; filename=${filename}`,
-          'Link': '</favicon.ico?v=17>; rel="icon"',
+          'Link': '</favicon.ico?v=18>; rel="icon"',
           'X-Frame-Options': 'SAMEORIGIN'
         }
       })
@@ -847,7 +847,7 @@ function generateBillHTML(bill: any, items: any[], pageNumber: number, totalPage
                 <div class="bank-title">BANK DETAILS:</div>
                 <div class="bank-grid">
                   <div style="display: flex; gap: 8px;"><span>BANK :</span> <span style="color: #000;">${bill.bank_name}</span></div>
-                  <div style="display: flex; gap: 8px;"><span>BRANCH :</span> <span style="color: #000;">${bill.bank_branch || 'SANGLI BRANCH'}</span></div>
+                  <div style="display: flex; gap: 8px;"><span>BRANCH :</span> <span style="color: #000;">${bill.bank_branch || ''}</span></div>
                   <div style="display: flex; gap: 8px;"><span>A/C NO :</span> <span style="color: #000;">${bill.bank_account}</span></div>
                   <div style="display: flex; gap: 8px;"><span>IFSC :</span> <span style="color: #000;">${bill.bank_ifsc}</span></div>
                 </div>
