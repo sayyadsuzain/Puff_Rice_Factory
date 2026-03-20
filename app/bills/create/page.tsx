@@ -259,15 +259,15 @@ export default function CreateBillPage() {
   }
 
   const loadBankDetails = (bank: SavedBankDetail) => {
-    setBankName(bank.bank_name)
-    setBankIFSC(bank.bank_ifsc)
-    setBankAccount(bank.bank_account)
+    setBankName(bank.bank_name || '')
+    setBankIFSC(bank.bank_ifsc || '')
+    setBankAccount(bank.bank_account || '')
     setBankBranch(bank.bank_branch || '')
     setOriginalBankDetails({
       id: bank.id,
-      name: bank.bank_name,
-      ifsc: bank.bank_ifsc,
-      account: bank.bank_account,
+      name: bank.bank_name || '',
+      ifsc: bank.bank_ifsc || '',
+      account: bank.bank_account || '',
       branch: bank.bank_branch || ''
     })
     setShouldUpdateBankProfile(false)
