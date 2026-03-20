@@ -722,11 +722,11 @@ export default function MonthlyBillBookPage() {
             <CardDescription>Bills will be sorted by date (oldest first) then by bill number</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-muted-foreground max-h-[500px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200">
               {bills.map((bill, index) => (
-                <div key={bill.id} className="flex justify-between py-1 border-b last:border-b-0">
-                  <span>{index + 1}. {formatBillNumber(bill)} - {formatDate(bill.bill_date)}</span>
-                  <span>{bill.parties?.name}</span>
+                <div key={bill.id} className="flex justify-between py-2 border-b last:border-b-0 hover:bg-gray-50/50 transition-colors">
+                  <span className="font-medium text-gray-700">{index + 1}. {formatBillNumber(bill)} - <span className="text-gray-400 font-normal">{formatDate(bill.bill_date)}</span></span>
+                  <span className="text-right">{bill.parties?.name || '---'}</span>
                 </div>
               ))}
             </div>
