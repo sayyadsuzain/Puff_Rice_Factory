@@ -46,6 +46,9 @@ export type Bill = {
   bank_ifsc?: string
   bank_account?: string
   bank_branch?: string
+  taxable_amount?: number
+  net_total?: number
+  grand_total?: number
   notes?: string
   created_at: string
   updated_at: string

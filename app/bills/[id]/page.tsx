@@ -273,11 +273,11 @@ export default function BillDetailPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full">
             <Button
               variant="outline"
-              className="gap-2 h-12 text-sm md:text-base font-bold shadow-sm"
+              className="gap-2 h-12 text-sm md:text-base font-bold shadow-sm border-gray-200"
               onClick={handlePrint}
               disabled={!partyName || partyName.trim() === ''}
             >
-              <Printer className="h-4 w-4 text-gray-400" />
+              <Printer className="h-5 w-5 text-red-600" />
               <span>Print <span className="hidden xs:inline">PDF</span></span>
             </Button>
 

@@ -601,7 +601,7 @@ export async function POST(request: NextRequest) {
         headers: {
           'Content-Type': 'application/pdf',
           'Content-Disposition': `attachment; filename=${filename}`,
-          'Link': '</api/monthly-bill-book>; rel="canonical"; v="21"',
+          'Link': '</api/monthly-bill-book>; rel="canonical"; v="22"',
           'X-Frame-Options': 'SAMEORIGIN'
         }
       })

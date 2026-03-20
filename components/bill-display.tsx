@@ -381,7 +381,7 @@ const BILL_CSS = `
 export default function BillDisplay({ bill, items, partyName, partyGst }: BillDisplayProps) {
   const { scale, containerRef } = useScale()
   const isKacchi = bill.bill_type === 'kacchi'
-  const grandTotal = bill.net_total || bill.grand_total || 0
+  const grandTotal = bill.net_total || bill.grand_total || (bill.total_amount + (bill.gst_total || 0) + (bill.balance || 0))
   
   // Total in words
   const totalInWords = bill.total_amount_words || (grandTotal > 0 ? `${numberToWords(Math.round(grandTotal))} Only.` : '')
@@ -423,13 +423,7 @@ export default function BillDisplay({ bill, items, partyName, partyGst }: BillDi
       <style>{BILL_CSS}</style>
       <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;900&display=swap" rel="stylesheet" />
 
-      {/* Action Buttons - adapted for mobile viewing */}
-      <div className="mb-4 flex gap-4 no-print sm:hidden">
-        <Button onClick={handlePrint} variant="outline" size="sm" className="font-bold border-red-200 text-red-600 bg-white">
-          <Printer className="h-4 w-4 mr-2" />
-          PDF Preview
-        </Button>
-      </div>
+      {/* Removed redundant PDF button as the main Print button is now polished and prominent */}
 
       <div className="mb-6 flex gap-4 no-print hidden sm:flex">
         <Button onClick={handlePrint} variant="default" className="bg-red-600 hover:bg-red-700">

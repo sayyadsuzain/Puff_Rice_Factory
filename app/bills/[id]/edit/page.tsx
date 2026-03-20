@@ -530,7 +530,10 @@ export default function EditBillPage() {
         cgst_amount: isGstEnabled ? (totalAmount * cgstPercent / 100) : 0,
         igst_amount: isGstEnabled ? (totalAmount * igstPercent / 100) : 0,
         sgst_amount: 0, // Not used in current implementation
-        gst_total: gstTotal
+        gst_total: gstTotal,
+        taxable_amount: totalAmount,
+        net_total: grandTotal,
+        grand_total: grandTotal
       }
 
       console.log('Bill update data:', billUpdateData)
