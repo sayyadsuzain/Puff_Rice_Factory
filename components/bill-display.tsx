@@ -173,10 +173,10 @@ const BILL_CSS = `
   }
 
   .info-label {
-    font-weight: bold;
+    font-weight: 900;
     font-size: 10px;
     text-transform: uppercase;
-    color: #6b7280;
+    color: #4b5563;
   }
 
   .bill-no {
@@ -225,36 +225,37 @@ const BILL_CSS = `
     font-size: 11px;
     border-collapse: collapse;
     table-layout: fixed;
+    border-bottom: 2px solid #000;
   }
 
   .items-table thead tr {
     background-color: #f9fafb;
-    border-top: 1.5px solid #374151;
-    border-bottom: 1.5px solid #374151;
+    border-top: 2px solid #000;
+    border-bottom: 2px solid #000;
     height: 28px;
   }
 
   .items-table th {
-    border-left: 1px solid #9ca3af;
-    border-right: 1px solid #9ca3af;
+    border-left: 1.5px solid #000;
+    border-right: 1.5px solid #000;
     padding: 2px 6px;
     text-align: center;
     font-weight: 900;
     text-transform: uppercase;
     font-size: 10px;
-    color: #374151;
+    color: #000;
   }
 
   .items-table td {
-    border-left: 1px solid #9ca3af;
-    border-right: 1px solid #9ca3af;
+    border-left: 1.5px solid #000;
+    border-right: 1.5px solid #000;
     padding: 4px 6px;
     vertical-align: middle;
   }
 
   .item-row {
     height: 26px;
-    border-bottom: 0.5px solid #f3f4f6;
+    border-bottom: 1px solid #e5e7eb;
   }
   
   .item-row.filler {

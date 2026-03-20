@@ -27,16 +27,16 @@ export const metadata: Metadata = {
         media: '(prefers-color-scheme: dark)',
       },
       {
-        url: '/icon.png?v=22',
+        url: '/icon.png?v=23',
         type: 'image/png',
       },
       {
-        url: '/favicon.ico?v=22',
+        url: '/favicon.ico?v=23',
       },
     ],
-    apple: '/apple-icon.png?v=22',
+    apple: '/apple-icon.png?v=23',
   },
-  manifest: '/site.webmanifest?v=22',
+  manifest: '/site.webmanifest?v=23',
 }
 
 export default function RootLayout({
