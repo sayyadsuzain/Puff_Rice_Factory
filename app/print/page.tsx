@@ -12,7 +12,7 @@ function PrintContent() {
 
   useEffect(() => {
     if (id) {
-      setPdfUrl(`/api/bill-pdf?id=${id}${token ? `&token=${token}` : ''}&v=24`)
+      setPdfUrl(`/api/bill-pdf?id=${id}&v=25${token ? `&token=${token}` : ''}`)
     }
   }, [id, token])
 

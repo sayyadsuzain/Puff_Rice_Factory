@@ -70,7 +70,7 @@ const BILL_CSS = `
     pointer-events: none;
     user-select: none;
     z-index: 0;
-    opacity: 0.12;
+    opacity: 0.25;
     font-size: 300px;
     font-weight: 900;
     letter-spacing: 20px;

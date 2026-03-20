@@ -227,7 +227,7 @@ export async function POST(request: NextRequest) {
             pointer-events: none;
             user-select: none;
             z-index: 0;
-            opacity: 0.12;
+            opacity: 0.25;
             font-size: 300px;
             font-weight: 900;
             letter-spacing: 20px;
@@ -601,7 +601,7 @@ export async function POST(request: NextRequest) {
         headers: {
           'Content-Type': 'application/pdf',
           'Content-Disposition': `attachment; filename=${filename}`,
-          'Link': '</api/monthly-bill-book>; rel="canonical"; v="24"',
+          'Link': '</api/monthly-bill-book>; rel="canonical"; v="25"',
           'X-Frame-Options': 'SAMEORIGIN'
         }
       })
